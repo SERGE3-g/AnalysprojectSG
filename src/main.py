@@ -242,15 +242,58 @@ class MainApp:
 
         docs_text = """
         Multi-Tool Analyzer
-        ==================
+        ===================
 
-        Un'applicazione completa per:
-        - Analisi codici fiscali
-        - Gestione file
-        - Gestione inventario
+        Descrizione
+        -----------
+        Il Multi-Tool Analyzer è un'applicazione completa e versatile progettata per semplificare la gestione e l'analisi di dati tramite diverse funzionalità integrate. È uno strumento ideale per chi cerca un'interfaccia unica per gestire compiti amministrativi, analizzare file, elaborare codici fiscali e molto altro.
 
-        Per supporto:
-        https://github.com/SERGE3-g
+        Funzionalità Principali
+        -----------------------
+        - **Analisi Codici Fiscali**
+          Esegui l'analisi e la validazione dei codici fiscali in modo rapido ed efficiente.
+
+        - **Gestione File**
+          Strumenti per la lettura e la manipolazione di file, organizzati in un'interfaccia user-friendly.
+
+        - **Gestione Inventario**
+          Gestisci e organizza facilmente i tuoi inventari con strumenti avanzati per il monitoraggio e l'archiviazione.
+
+        Requisiti di Sistema
+        --------------------
+        - Sistema operativo: Windows, macOS, Linux
+        - Python 3.6 (o versioni successive)
+        - Moduli necessari:
+          - tkinter (per l'interfaccia)
+          - json (per la gestione delle configurazioni)
+          - pandas (per l'elaborazione dei dati)
+          - reportlab (per la generazione di PDF)
+
+        Installazione
+        -------------
+        1. Clona o scarica il repository dal seguente link:
+           https://github.com/SERGE3-g
+
+        2. Assicurati che i moduli richiesti siano installati:
+           ```bash
+           pip install -r requirements.txt
+           ```
+
+        3. Avvia l'applicazione con:
+           ```bash
+           python main.py
+           ```
+
+        Supporto
+        --------
+        Per segnalare problemi o per ulteriore assistenza, visita il repository ufficiale del progetto:
+        [GitHub - Multi-Tool Analyzer](https://github.com/SERGE3-g)
+
+        Licenza
+        -------
+        © 2025 SergeGuea. Tutti i diritti riservati.
+
+        L'uso di questo software è regolato dalla licenza fornita nel repository online.
         """
 
         text.insert('1.0', docs_text)

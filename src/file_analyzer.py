@@ -1,519 +1,802 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-import json
-import xml.etree.ElementTree as ET
-import os
-import pandas as pd
-from datetime import datetime
-import re
 import threading
-from queue import Queue
+from datetime import datetime
+import pandas as pd
+from openpyxl.styles import PatternFill, Font, Alignment
+from openpyxl import load_workbook
+import os
+import re
+import json
+import queue as Queue
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 class FileTab:
     def __init__(self, notebook):
         self.frame = ttk.Frame(notebook)
-        notebook.add(self.frame, text='Analisi File')
+        notebook.add(self.frame, text='Analisi Check SDD')
 
-        # Inizializzazione variabili
-        self.current_files = []
-        self.result_queue = Queue()
+        # Variabili
+        self.selected_files = []
+        self.result_queue = Queue.Queue()
+        self.log_queue = Queue.Queue()
 
-        # Setup interfaccia
+        # Stile
+        self.setup_style()
+
+        # Creazione interfaccia
         self.create_gui()
+
+        # Avvio processamento code
+        self.process_queues()
+
+    def setup_style(self):
+        """Configura lo stile dell'interfaccia"""
+        self.style = ttk.Style()
+        self.style.configure('Header.TLabel',
+                             font=("Arial", 20, "bold"),
+                             padding=10)
+        self.style.configure('Title.TLabel',
+                             font=("Arial", 14),
+                             padding=5)
 
     def create_gui(self):
         """Crea l'interfaccia grafica"""
-        # Frame superiore per caricamento file
-        self.create_upload_frame()
+        # Frame principale con divisione verticale
+        main_frame = ttk.PanedWindow(self.frame, orient=tk.HORIZONTAL)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        # Frame centrale per opzioni analisi
-        self.create_options_frame()
+        # Pannello sinistro (controlli)
+        left_panel = self.create_left_panel(main_frame)
+        main_frame.add(left_panel, weight=1)
 
-        # Frame per la progress bar
-        self.create_progress_frame()
+        # Pannello destro (risultati)
+        right_panel = self.create_right_panel(main_frame)
+        main_frame.add(right_panel, weight=3)
 
-        # Frame inferiore per risultati
-        self.create_results_frame()
+    def create_left_panel(self, parent):
+        """Crea il pannello sinistro con i controlli"""
+        panel = ttk.Frame(parent)
 
-    def create_upload_frame(self):
-        """Crea il frame per il caricamento dei file"""
-        upload_frame = ttk.LabelFrame(self.frame, text="Carica File", padding=10)
-        upload_frame.pack(fill='x', padx=5, pady=5)
+        # Header
+        ttk.Label(
+            panel,
+            text="Analizzatore File",
+            style='Header.TLabel'
+        ).pack(fill=tk.X)
 
-        # Entry per i file selezionati
-        self.file_entry = ttk.Entry(upload_frame)
-        self.file_entry.pack(side='left', expand=True, fill='x', padx=(0, 5))
+        # Selezione file
+        file_frame = ttk.LabelFrame(panel, text="File", padding=5)
+        file_frame.pack(fill=tk.X, padx=5, pady=5)
+
+        self.file_entry = ttk.Entry(file_frame)
+        self.file_entry.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=5)
+
+        ttk.Button(
+            file_frame,
+            text="Sfoglia",
+            command=self.browse_files
+        ).pack(side=tk.RIGHT)
+
+        # Opzioni
+        options_frame = ttk.LabelFrame(panel, text="Opzioni", padding=5)
+        options_frame.pack(fill=tk.X, padx=5, pady=5)
+
+        # Tipo analisi
+        self.analysis_type = tk.StringVar(value="standard")
+        ttk.Radiobutton(
+            options_frame,
+            text="Analisi Standard",
+            variable=self.analysis_type,
+            value="standard"
+        ).pack(anchor=tk.W)
+        ttk.Radiobutton(
+            options_frame,
+            text="Analisi Dettagliata",
+            variable=self.analysis_type,
+            value="detailed"
+        ).pack(anchor=tk.W)
+
+        # Filtri
+        filters_frame = ttk.LabelFrame(options_frame, text="Filtri", padding=5)
+        filters_frame.pack(fill=tk.X, pady=5)
+
+        ttk.Label(filters_frame, text="Importo minimo:").pack(anchor=tk.W)
+        self.min_amount = ttk.Entry(filters_frame)
+        self.min_amount.pack(fill=tk.X, padx=5)
+
+        ttk.Label(filters_frame, text="Importo massimo:").pack(anchor=tk.W)
+        self.max_amount = ttk.Entry(filters_frame)
+        self.max_amount.pack(fill=tk.X, padx=5)
 
         # Bottoni
-        btn_frame = ttk.Frame(upload_frame)
-        btn_frame.pack(side='right')
+        button_frame = ttk.Frame(panel)
+        button_frame.pack(fill=tk.X, padx=5, pady=10)
 
-        ttk.Button(btn_frame, text="Sfoglia",
-                   command=self.browse_files).pack(side='left', padx=2)
-        ttk.Button(btn_frame, text="Pulisci",
-                   command=self.clear_files).pack(side='left', padx=2)
+        self.start_button = ttk.Button(
+            button_frame,
+            text="Avvia Analisi",
+            command=self.start_analysis
+        )
+        self.start_button.pack(side=tk.LEFT, padx=5)
 
-    def create_options_frame(self):
-        """Crea il frame per le opzioni di analisi"""
-        options_frame = ttk.LabelFrame(self.frame, text="Opzioni Analisi", padding=10)
-        options_frame.pack(fill='x', padx=5, pady=5)
+        ttk.Button(
+            button_frame,
+            text="Reset",
+            command=self.reset_gui
+        ).pack(side=tk.LEFT)
 
-        # Tipo di analisi
-        ttk.Label(options_frame, text="Tipo analisi:").pack(side='left')
-        self.analysis_type = tk.StringVar(value="auto")
-        analysis_combo = ttk.Combobox(options_frame,
-                                      textvariable=self.analysis_type,
-                                      values=["auto", "xml", "json", "txt"],
-                                      state="readonly")
-        analysis_combo.pack(side='left', padx=5)
+        return panel
 
-        # Checkbox per opzioni
-        self.recursive_var = tk.BooleanVar(value=True)
-        ttk.Checkbutton(options_frame, text="Analisi ricorsiva",
-                        variable=self.recursive_var).pack(side='left', padx=5)
+    def create_right_panel(self, parent):
+        """Crea il pannello destro con i risultati"""
+        panel = ttk.Frame(parent)
 
-        self.extract_numbers_var = tk.BooleanVar(value=True)
-        ttk.Checkbutton(options_frame, text="Estrai numeri",
-                        variable=self.extract_numbers_var).pack(side='left', padx=5)
+        # Progress bar - Inizializzazione corretta
+        progress_frame = ttk.Frame(panel)
+        progress_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        # Bottone analisi
-        ttk.Button(options_frame, text="Analizza",
-                   command=self.start_analysis).pack(side='right', padx=5)
-
-    def create_progress_frame(self):
-        """Crea il frame per la barra di progresso"""
-        progress_frame = ttk.Frame(self.frame)
-        progress_frame.pack(fill='x', padx=5, pady=5)
-
-        self.progress_var = tk.DoubleVar()
-        self.progress = ttk.Progressbar(progress_frame,
-                                        variable=self.progress_var,
-                                        maximum=100)
-        self.progress.pack(fill='x')
+        # Inizializza progress_var
+        self.progress_var = tk.DoubleVar()  # Aggiungi questa linea
 
         self.progress_label = ttk.Label(progress_frame, text="")
         self.progress_label.pack()
 
-    def create_results_frame(self):
-        """Crea il frame per i risultati"""
-        results_frame = ttk.LabelFrame(self.frame, text="Risultati", padding=10)
-        results_frame.pack(fill='both', expand=True, padx=5, pady=5)
+        self.progress_bar = ttk.Progressbar(
+            progress_frame,
+            orient=tk.HORIZONTAL,
+            mode='determinate',
+            variable=self.progress_var  # Usa la variabile inizializzata
+        )
+        self.progress_bar.pack(fill=tk.X)
 
-        # Notebook per diversi tipi di risultati
-        self.results_notebook = ttk.Notebook(results_frame)
-        self.results_notebook.pack(fill='both', expand=True)
+        # Notebook per risultati
+        self.results_notebook = ttk.Notebook(panel)
+        self.results_notebook.pack(fill=tk.BOTH, expand=True)
 
-        # Tab per testo
-        text_frame = ttk.Frame(self.results_notebook)
-        self.results_notebook.add(text_frame, text='Testo')
+        # Tab risultati
+        self.create_results_tab()
 
-        # Scrollbar per il testo
-        text_scroll = ttk.Scrollbar(text_frame)
-        text_scroll.pack(side='right', fill='y')
+        # Tab grafico
+        self.create_chart_tab()
 
-        self.result_text = tk.Text(text_frame, wrap='word',
-                                   yscrollcommand=text_scroll.set)
-        self.result_text.pack(fill='both', expand=True)
-        text_scroll.config(command=self.result_text.yview)
+        # Tab log
+        self.create_log_tab()
 
-        # Tab per struttura
-        tree_frame = ttk.Frame(self.results_notebook)
-        self.results_notebook.add(tree_frame, text='Struttura')
+        return panel
 
-        # Treeview per struttura
-        self.tree = ttk.Treeview(tree_frame, show='tree')
-        tree_scroll = ttk.Scrollbar(tree_frame, command=self.tree.yview)
-        self.tree.configure(yscrollcommand=tree_scroll.set)
+    def update_progress(self, current, total):
+        """Aggiorna la barra di progresso"""
+        progress = (current / total) * 100
+        self.progress_var.set(progress)  # Ora questa linea funzionerà
+        self.progress_label.config(text=f"Analizzato {current} di {total} file")
+        self.frame.update_idletasks()
 
-        self.tree.pack(side='left', fill='both', expand=True)
-        tree_scroll.pack(side='right', fill='y')
+    def create_results_tab(self):
+        """Crea il tab dei risultati"""
+        results_frame = ttk.Frame(self.results_notebook)
+        self.results_notebook.add(results_frame, text="Risultati")
 
-        # Bottoni azione
-        action_frame = ttk.Frame(results_frame)
-        action_frame.pack(fill='x', pady=5)
+        # Toolbar
+        toolbar = ttk.Frame(results_frame)
+        toolbar.pack(fill=tk.X, pady=5)
 
-        ttk.Button(action_frame, text="Esporta Excel",
-                   command=self.export_excel).pack(side='left', padx=2)
-        ttk.Button(action_frame, text="Salva Report",
-                   command=self.save_report).pack(side='left', padx=2)
-        ttk.Button(action_frame, text="Copia",
-                   command=self.copy_results).pack(side='left', padx=2)
+        ttk.Button(
+            toolbar,
+            text="Esporta Excel",
+            command=self.export_excel
+        ).pack(side=tk.LEFT, padx=2)
+
+        ttk.Button(
+            toolbar,
+            text="Mostra Statistiche",
+            command=self.show_statistics
+        ).pack(side=tk.LEFT, padx=2)
+
+        # Tabella risultati
+        columns = (
+            'File', 'NbOfTxs', 'TtlIntrBkSttlmAmt',
+            'Data Analisi', 'Stato'
+        )
+
+        self.results_tree = ttk.Treeview(
+            results_frame,
+            columns=columns,
+            show='headings'
+        )
+
+        # Configurazione colonne
+        for col in columns:
+            self.results_tree.heading(col, text=col)
+            self.results_tree.column(col, width=120)
+
+        # Scrollbar
+        scrollbar = ttk.Scrollbar(
+            results_frame,
+            orient=tk.VERTICAL,
+            command=self.results_tree.yview
+        )
+
+        self.results_tree.configure(yscrollcommand=scrollbar.set)
+
+        # Layout
+        self.results_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+    def create_chart_tab(self):
+        """Crea il tab del grafico"""
+        chart_frame = ttk.Frame(self.results_notebook)
+        self.results_notebook.add(chart_frame, text="Grafico")
+
+        # Tipo di grafico
+        control_frame = ttk.Frame(chart_frame)
+        control_frame.pack(fill=tk.X)
+
+        self.chart_type = tk.StringVar(value="bar")
+        ttk.Radiobutton(
+            control_frame,
+            text="Barre",
+            variable=self.chart_type,
+            value="bar",
+            command=self.update_chart
+        ).pack(side=tk.LEFT)
+
+        ttk.Radiobutton(
+            control_frame,
+            text="Linee",
+            variable=self.chart_type,
+            value="line",
+            command=self.update_chart
+        ).pack(side=tk.LEFT)
+
+        # Area grafico
+        self.figure = Figure(figsize=(6, 4), dpi=100)
+        self.canvas = FigureCanvasTkAgg(self.figure, master=chart_frame)
+        self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+    def create_log_tab(self):
+        """Crea il tab del log"""
+        log_frame = ttk.Frame(self.results_notebook)
+        self.results_notebook.add(log_frame, text="Log")
+
+        # Area log
+        self.log_text = tk.Text(log_frame, wrap=tk.WORD)
+
+        scrollbar = ttk.Scrollbar(
+            log_frame,
+            orient=tk.VERTICAL,
+            command=self.log_text.yview
+        )
+
+        self.log_text.configure(yscrollcommand=scrollbar.set)
+
+        self.log_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # Tag per colorare i messaggi
+        self.log_text.tag_configure("ERROR", foreground="red")
+        self.log_text.tag_configure("WARNING", foreground="orange")
+        self.log_text.tag_configure("SUCCESS", foreground="green")
+
+    def process_queues(self):
+        """Processa le code dei risultati e dei log"""
+        # Processa coda risultati
+        try:
+            while True:
+                action, data = self.result_queue.get_nowait()
+                if action == "update_tree":
+                    self.update_results_tree(data)
+                elif action == "update_chart":
+                    self.update_chart(data)
+        except Queue.Empty:
+            pass
+
+        # Processa coda log
+        try:
+            while True:
+                level, message = self.log_queue.get_nowait()
+                self.add_log(level, message)
+        except Queue.Empty:
+            pass
+
+        # Rischedula
+        self.frame.after(100, self.process_queues)
 
     def browse_files(self):
-        """Apre il dialogo per selezionare i file"""
+        """Gestisce la selezione dei file"""
         files = filedialog.askopenfilenames(
-            title="Seleziona file da analizzare",
             filetypes=[
-                ("Tutti i file", "*.*"),
+                ("File supportati", "*.txt *.xml *.json"),
                 ("File XML", "*.xml"),
                 ("File JSON", "*.json"),
                 ("File di testo", "*.txt")
             ]
         )
         if files:
-            self.current_files = files
+            self.selected_files = list(files)
             self.file_entry.delete(0, tk.END)
             self.file_entry.insert(0, "; ".join(files))
-
-    def clear_files(self):
-        """Pulisce la selezione dei file"""
-        self.current_files = []
-        self.file_entry.delete(0, tk.END)
-        self.result_text.delete(1.0, tk.END)
-        self.tree.delete(*self.tree.get_children())
-        self.progress_var.set(0)
-        self.progress_label.config(text="")
+            self.log_queue.put(("INFO", f"Selezionati {len(files)} file"))
 
     def start_analysis(self):
         """Avvia l'analisi dei file"""
-        if not self.current_files:
+        if not self.selected_files:
             messagebox.showwarning("Attenzione", "Seleziona almeno un file!")
             return
 
-        # Pulisci risultati precedenti
-        self.result_text.delete(1.0, tk.END)
-        self.tree.delete(*self.tree.get_children())
+        # Disabilita il bottone di avvio
+        self.start_button.config(state=tk.DISABLED)
 
-        # Avvia thread di analisi
-        threading.Thread(target=self.analyze_files, daemon=True).start()
+        # Pulisci le visualizzazioni precedenti
+        self.results_tree.delete(*self.results_tree.get_children())  # Pulisci tabella
+        self.progress_bar['value'] = 0  # Resetta progress bar
+        self.progress_label.config(text="")  # Pulisci label
+        self.figure.clear()  # Pulisci grafico
+        self.canvas.draw()
+        self.log_text.delete(1.0, tk.END)  # Pulisci log
 
-    def analyze_files(self):
-        """Analizza i file selezionati"""
+        # Nome file output
+        now = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_excel = f"SDD_CHECK_{now}.xlsx"
+
+        # Avvia thread analisi
+        threading.Thread(
+            target=self.process_files,
+            args=(self.selected_files, output_excel),
+            daemon=True
+        ).start()
+
+    def process_files(self, files, output_excel):
+        """Elabora i file selezionati"""
         try:
-            total_files = len(self.current_files)
-            for i, file_path in enumerate(self.current_files, 1):
-                # Aggiorna progresso
-                progress = (i / total_files) * 100
-                self.update_progress(progress, f"Analisi file {i} di {total_files}")
+            self.log_queue.put(("INFO", "Avvio analisi..."))
 
-                # Analizza file
-                filename = os.path.basename(file_path)
-                file_type = self.detect_file_type(file_path)
+            data = []
+            total_files = len(files)
+            errors = []
 
+            for i, file_path in enumerate(files, 1):
                 try:
-                    if file_type == "xml":
-                        self.analyze_xml(file_path)
-                    elif file_type == "json":
-                        self.analyze_json(file_path)
-                    else:
-                        self.analyze_text(file_path)
+                    # Aggiorna progresso
+                    self.update_progress(i, total_files)
+
+                    # Analizza file
+                    results = self.parse_file(file_path)
+
+                    # Applica filtri se necessario
+                    results = self.apply_filters(results)
+
+                    if results:
+                        # Aggiungi info file
+                        file_data = {
+                            'file': os.path.basename(file_path),
+                            'results': results,
+                            'timestamp': datetime.now(),
+                            'status': 'OK'
+                        }
+                        data.append(file_data)
+
+                        # Aggiorna visualizzazioni
+                        self.result_queue.put(("update_tree", file_data))
+
                 except Exception as e:
-                    self.result_queue.put(("error", f"Errore nell'analisi di {filename}: {str(e)}"))
+                    errors.append((file_path, str(e)))
+                    self.log_queue.put(
+                        ("ERROR", f"Errore nell'analisi di {file_path}: {str(e)}")
+                    )
 
-            self.update_progress(100, "Analisi completata")
+            if data:
+                # Crea report Excel
+                self.create_excel_report(data, output_excel)
 
-        except Exception as e:
-            messagebox.showerror("Errore", f"Errore durante l'analisi: {str(e)}")
+                # Aggiorna grafico
+                self.result_queue.put(("update_chart", data))
 
-    def detect_file_type(self, file_path):
-        """Rileva il tipo di file"""
-        if self.analysis_type.get() != "auto":
-            return self.analysis_type.get()
+                self.log_queue.put(
+                    ("SUCCESS", f"Analisi completata. File salvato: {output_excel}")
+                )
+                messagebox.showinfo(
+                    "Successo",
+                    f"Analisi completata. File salvato: {output_excel}"
+                )
+            else:
+                self.log_queue.put(("WARNING", "Nessun dato trovato nei file"))
+                messagebox.showwarning(
+                    "Attenzione",
+                    "Nessun dato trovato nei file analizzati"
+                )
 
-        ext = os.path.splitext(file_path)[1].lower()
-        if ext == ".xml":
-            return "xml"
-        elif ext == ".json":
-            return "json"
-        return "txt"
-
-    def analyze_xml(self, file_path):
-        """Analizza un file XML"""
-        try:
-            tree = ET.parse(file_path)
-            root = tree.getroot()
-
-            # Analisi struttura
-            def process_element(element, parent=""):
-                info = {
-                    "tag": element.tag,
-                    "attributes": element.attrib,
-                    "text": element.text.strip() if element.text else "",
-                    "children": []
-                }
-
-                for child in element:
-                    info["children"].append(process_element(child))
-
-                return info
-
-            structure = process_element(root)
-
-            # Inserisci nella treeview
-            def add_to_tree(data, parent=""):
-                tag = data["tag"]
-                if data["attributes"]:
-                    tag += f" {data['attributes']}"
-                if data["text"]:
-                    tag += f": {data['text']}"
-
-                item = self.tree.insert(parent, "end", text=tag)
-                for child in data["children"]:
-                    add_to_tree(child, item)
-
-            self.result_queue.put(("tree", structure))
-
-            # Aggiungi al testo
-            filename = os.path.basename(file_path)
-            summary = f"\nAnalisi XML: {filename}\n"
-            summary += f"Numero elementi: {len(root.findall('.//*')) + 1}\n"
-            summary += f"Profondità massima: {self.get_xml_depth(root)}\n"
-
-            self.result_queue.put(("text", summary))
-
-        except ET.ParseError as e:
-            self.result_queue.put(("error", f"Errore nel parsing XML: {str(e)}"))
-
-    def analyze_json(self, file_path):
-        """Analizza un file JSON"""
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-
-            # Analisi struttura
-            def process_json(obj, parent=""):
-                if isinstance(obj, dict):
-                    for key, value in obj.items():
-                        item = self.tree.insert(parent, "end", text=key)
-                        process_json(value, item)
-                elif isinstance(obj, list):
-                    for i, value in enumerate(obj):
-                        item = self.tree.insert(parent, "end", text=f"[{i}]")
-                        process_json(value, item)
-                else:
-                    self.tree.insert(parent, "end", text=str(obj))
-
-            self.result_queue.put(("json", data))
-
-            # Statistiche
-            filename = os.path.basename(file_path)
-            summary = f"\nAnalisi JSON: {filename}\n"
-            summary += f"Dimensione: {os.path.getsize(file_path)} bytes\n"
-            summary += self.analyze_json_structure(data)
-
-            self.result_queue.put(("text", summary))
-
-        except json.JSONDecodeError as e:
-            self.result_queue.put(("error", f"Errore nel parsing JSON: {str(e)}"))
-
-    def analyze_text(self, file_path):
-        """Analizza un file di testo"""
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-            # Statistiche base
-            filename = os.path.basename(file_path)
-            summary = f"\nAnalisi testo: {filename}\n"
-            summary += f"Numero righe: {len(content.splitlines())}\n"
-            summary += f"Numero parole: {len(content.split())}\n"
-            summary += f"Numero caratteri: {len(content)}\n"
-
-            # Estrai numeri se richiesto
-            if self.extract_numbers_var.get():
-                numbers = re.findall(r'\b\d+(?:\.\d+)?\b', content)
-                if numbers:
-                    summary += f"\nNumeri trovati: {len(numbers)}\n"
-                    if len(numbers) <= 10:  # Mostra solo i primi 10 numeri
-                        summary += "Valori: " + ", ".join(numbers) + "\n"
-
-            self.result_queue.put(("text", summary))
+            if errors:
+                self.show_errors_dialog(errors)
 
         except Exception as e:
-            self.result_queue.put(("error", f"Errore nell'analisi del testo: {str(e)}"))
+            self.log_queue.put(("ERROR", f"Errore durante l'analisi: {str(e)}"))
+            messagebox.showerror("Errore", str(e))
 
-    def get_xml_depth(self, element, level=1):
-        """Calcola la profondità massima di un elemento XML"""
-        return max([level] + [self.get_xml_depth(child, level + 1)
-                              for child in element])
+        finally:
+            self.start_button.config(state=tk.NORMAL)
 
-    def analyze_json_structure(self, data, level=0):
-        """Analizza la struttura di un oggetto JSON"""
-        summary = ""
-        if isinstance(data, dict):
-            summary += f"Oggetto con {len(data)} chiavi\n"
-            for key, value in data.items():
-                summary += "  " * level + f"- {key}: "
-                summary += self.analyze_json_structure(value, level + 1)
-        elif isinstance(data, list):
-            summary += f"Array con {len(data)} elementi\n"
-            if len(data) > 0:
-                summary += self.analyze_json_structure(data[0], level + 1)
-        else:
-            summary += f"Valore di tipo {type(data).__name__}\n"
-        return summary
+    def parse_file(self, file_path):
+        """Analizza il file per estrarre i valori"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
 
-    def update_progress(self, value, text):
+                # Cerca i valori con regex
+                txs_matches = re.findall(r'<NbOfTxs>(\d+)</NbOfTxs>', content)
+                amt_matches = re.findall(r'<TtlIntrBkSttlmAmt[^>]*>([0-9.]+)</TtlIntrBkSttlmAmt>', content)
+
+                results = []
+                for txs, amt in zip(txs_matches, amt_matches):
+                    results.append({
+                        'NbOfTxs': int(txs),
+                        'TtlIntrBkSttlmAmt': float(amt)
+                    })
+
+                return results
+
+        except Exception as e:
+            self.log_queue.put(("ERROR", f"Errore nel parsing del file {file_path}: {str(e)}"))
+            raise
+
+    def apply_filters(self, results):
+        """Applica i filtri ai risultati"""
+        if not results:
+            return results
+
+        filtered = results.copy()
+
+        try:
+            # Filtro importo minimo
+            if self.min_amount.get():
+                min_val = float(self.min_amount.get())
+                filtered = [r for r in filtered if r['TtlIntrBkSttlmAmt'] >= min_val]
+
+            # Filtro importo massimo
+            if self.max_amount.get():
+                max_val = float(self.max_amount.get())
+                filtered = [r for r in filtered if r['TtlIntrBkSttlmAmt'] <= max_val]
+
+        except ValueError as e:
+            self.log_queue.put(("ERROR", "Errore nei filtri: i valori devono essere numerici"))
+            raise ValueError("I valori dei filtri devono essere numerici") from e
+
+        return filtered
+
+    def create_excel_report(self, data, output_file):
+        """Crea il report Excel con i risultati"""
+        try:
+            # Prepara i dati per il DataFrame
+            rows = []
+            for file_data in data:
+                for result in file_data['results']:
+                    rows.append({
+                        'File': file_data['file'],
+                        'NbOfTxs': result['NbOfTxs'],
+                        'TtlIntrBkSttlmAmt': result['TtlIntrBkSttlmAmt'],
+                        'Data Analisi': file_data['timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
+                        'Stato': file_data['status']
+                    })
+
+            # Crea DataFrame
+            df = pd.DataFrame(rows)
+
+            # Aggiungi riga totali
+            totals = pd.DataFrame([{
+                'File': 'TOTALE',
+                'NbOfTxs': df['NbOfTxs'].sum(),
+                'TtlIntrBkSttlmAmt': df['TtlIntrBkSttlmAmt'].sum(),
+                'Data Analisi': '',
+                'Stato': ''
+            }])
+
+            df = pd.concat([df, totals])
+
+            # Salva Excel
+            df.to_excel(output_file, index=False)
+
+            # Applica stili
+            self.apply_excel_styles(output_file)
+
+        except Exception as e:
+            self.log_queue.put(("ERROR", f"Errore nella creazione del report Excel: {str(e)}"))
+            raise
+
+    def apply_excel_styles(self, file_path):
+        """Applica stili al file Excel"""
+        wb = load_workbook(file_path)
+        ws = wb.active
+
+        # Stili
+        header_fill = PatternFill(start_color="CCCCCC", end_color="CCCCCC", fill_type="solid")
+        total_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+        bold_font = Font(bold=True)
+        center_align = Alignment(horizontal="center")
+
+        # Applica stili all'intestazione
+        for cell in ws[1]:
+            cell.fill = header_fill
+            cell.font = bold_font
+            cell.alignment = center_align
+
+        # Aggiorna larghezza colonne
+        for column in ws.columns:
+            max_length = 0
+            column_letter = column[0].column_letter
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            ws.column_dimensions[column_letter].width = max_length + 2
+
+        # Applica stili alla riga totale
+        for cell in ws[ws.max_row]:
+            cell.fill = total_fill
+            cell.font = bold_font
+            cell.alignment = center_align
+
+        wb.save(file_path)
+
+    def update_results_tree(self, file_data):
+        """Aggiorna la tabella dei risultati"""
+        for result in file_data['results']:
+            self.results_tree.insert('', 'end', values=(
+                file_data['file'],
+                result['NbOfTxs'],
+                result['TtlIntrBkSttlmAmt'],
+                file_data['timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
+                file_data['status']
+            ))
+
+    def update_chart(self, data=None):
+        """Aggiorna il grafico"""
+        self.figure.clear()
+        ax = self.figure.add_subplot(111)
+
+        if not data:
+            data = self._collect_tree_data()
+
+        if not data:
+            return
+
+        # Prepara i dati per il grafico
+        files = []
+        txs = []
+        amounts = []
+        for file_data in data:
+            for result in file_data['results']:
+                files.append(file_data['file'])
+                txs.append(result['NbOfTxs'])
+                amounts.append(result['TtlIntrBkSttlmAmt'])
+
+        # Crea il grafico appropriato
+        if self.chart_type.get() == "bar":
+            ax.bar(range(len(files)), amounts)
+        else:  # line
+            ax.plot(range(len(files)), amounts, marker='o')
+
+        ax.set_xticks(range(len(files)))
+        ax.set_xticklabels(files, rotation=45, ha='right')
+        ax.set_title('Analisi Importi per File')
+        ax.set_ylabel('Importo Totale')
+
+        self.figure.tight_layout()
+        self.canvas.draw()
+
+    def _collect_tree_data(self):
+        """Raccoglie i dati dalla tabella per il grafico"""
+        data = []
+        for item in self.results_tree.get_children():
+            values = self.results_tree.item(item)['values']
+            data.append({
+                'file': values[0],
+                'results': [{
+                    'NbOfTxs': values[1],
+                    'TtlIntrBkSttlmAmt': values[2]
+                }],
+                'timestamp': datetime.strptime(values[3], '%Y-%m-%d %H:%M:%S'),
+                'status': values[4]
+            })
+        return data
+
+    def update_progress(self, current, total):
         """Aggiorna la barra di progresso"""
-        self.progress_var.set(value)
-        self.progress_label.config(text=text)
+        progress = (current / total) * 100
+        self.progress_var.set(progress)
+        self.progress_label.config(text=f"Analizzato {current} di {total} file")
         self.frame.update_idletasks()
 
+    def add_log(self, level, message):
+        """Aggiunge un messaggio al log"""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.log_text.insert('end', f"[{timestamp}] {level}: {message}\n", level)
+        self.log_text.see('end')
+
+    def show_statistics(self):
+        """Mostra una finestra con statistiche dettagliate"""
+        data = self._collect_tree_data()
+        if not data:
+            messagebox.showinfo("Info", "Nessun dato disponibile per le statistiche")
+            return
+
+        stats_window = tk.Toplevel(self.frame)
+        stats_window.title("Statistiche")
+        stats_window.geometry("400x300")
+
+        # Calcola statistiche
+        all_amounts = [r['TtlIntrBkSttlmAmt'] for d in data for r in d['results']]
+        all_txs = [r['NbOfTxs'] for d in data for r in d['results']]
+
+        stats_text = f"""
+        Statistiche Analisi:
+
+        Numero file analizzati: {len(data)}
+
+        Importi:
+        - Totale: {sum(all_amounts):.2f}
+        - Media: {sum(all_amounts) / len(all_amounts):.2f}
+        - Minimo: {min(all_amounts):.2f}
+        - Massimo: {max(all_amounts):.2f}
+
+        Transazioni:
+        - Totale: {sum(all_txs)}
+        - Media: {sum(all_txs) / len(all_txs):.2f}
+        - Minimo: {min(all_txs)}
+        - Massimo: {max(all_txs)}
+        """
+
+        text = tk.Text(stats_window, wrap=tk.WORD, padx=10, pady=10)
+        text.pack(fill=tk.BOTH, expand=True)
+        text.insert('1.0', stats_text)
+        text.config(state='disabled')
+
+    def show_errors_dialog(self, errors):
+        """Mostra una finestra con gli errori riscontrati"""
+        dialog = tk.Toplevel(self.frame)
+        dialog.title("Errori Riscontrati")
+        dialog.geometry("500x300")
+
+        text = tk.Text(dialog, wrap=tk.WORD, padx=10, pady=10)
+        text.pack(fill=tk.BOTH, expand=True)
+
+        text.insert('1.0', "Errori durante l'analisi:\n\n")
+        for file_path, error in errors:
+            text.insert('end', f"File: {file_path}\nErrore: {error}\n\n")
+
+        text.config(state='disabled')
+
+    def reset_gui(self):
+        """Resetta l'interfaccia"""
+        self.file_entry.delete(0, tk.END)
+        self.min_amount.delete(0, tk.END)
+        self.max_amount.delete(0, tk.END)
+        self.progress_bar['value'] = 0
+        self.progress_label.config(text="")
+        self.results_tree.delete(*self.results_tree.get_children())
+        self.update_chart()
+        self.selected_files = []
+        self.log_queue.put(("INFO", "Interfaccia resettata"))
+
     def export_excel(self):
-        """Esporta i risultati in Excel"""
+        """Esporta i dati correnti in Excel"""
+        data = self._collect_tree_data()
+        if not data:
+            messagebox.showinfo("Info", "Nessun dato da esportare")
+            return
+
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".xlsx",
+            filetypes=[("Excel files", "*.xlsx")],
+            initialfile=f"analisi_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        )
+
+        if file_path:
+            try:
+                self.create_excel_report(data, file_path)
+                messagebox.showinfo("Successo", f"Dati esportati in: {file_path}")
+            except Exception as e:
+                messagebox.showerror("Errore", f"Errore nell'esportazione: {str(e)}")
+
+
+def _collect_tree_data(self):
+    """Raccoglie i dati dalla tabella per il grafico"""
+    data = []
+    for item in self.results_tree.get_children():
+        values = self.results_tree.item(item)['values']
         try:
-            if not self.result_text.get(1.0, tk.END).strip():
-                messagebox.showwarning("Attenzione", "Non ci sono risultati da esportare!")
-                return
+            data.append({
+                'file': values[0],
+                'results': [{
+                    'NbOfTxs': int(values[1]),  # Converti in intero
+                    'TtlIntrBkSttlmAmt': float(values[2])  # Converti in float
+                }],
+                'timestamp': datetime.strptime(values[3], '%Y-%m-%d %H:%M:%S'),
+                'status': values[4]
+            })
+        except (ValueError, TypeError):
+            continue  # Salta le righe con valori non validi
+    return data
 
-            file_path = filedialog.asksaveasfilename(
-                defaultextension=".xlsx",
-                filetypes=[("Excel files", "*.xlsx")],
-                initialfile=f"analisi_file_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
-            )
 
-            if file_path:
-                # Crea DataFrame
-                data = []
-                current_file = None
+def show_statistics(self):
+    """Mostra una finestra con statistiche dettagliate"""
+    data = self._collect_tree_data()
+    if not data:
+        messagebox.showinfo("Info", "Nessun dato disponibile per le statistiche")
+        return
 
-                for line in self.result_text.get(1.0, tk.END).split('\n'):
-                    if line.startswith('Analisi'):
-                        current_file = line.split(': ')[1]
-                    elif ':' in line and current_file:
-                        key, value = line.split(':', 1)
-                        data.append({
-                            'File': current_file,
-                            'Parametro': key.strip(),
-                            'Valore': value.strip()
-                        })
+    stats_window = tk.Toplevel(self.frame)
+    stats_window.title("Statistiche")
+    stats_window.geometry("400x300")
 
-                df = pd.DataFrame(data)
-                df.to_excel(file_path, index=False)
-                messagebox.showinfo("Successo", "Report Excel salvato con successo!")
+    try:
+        # Estrai e converti i valori assicurandoti che siano numeri
+        all_amounts = [float(r['TtlIntrBkSttlmAmt']) for d in data for r in d['results']]
+        all_txs = [int(r['NbOfTxs']) for d in data for r in d['results']]
 
-        except Exception as e:
-            messagebox.showerror("Errore", f"Errore durante l'esportazione: {str(e)}")
+        if not all_amounts or not all_txs:
+            messagebox.showwarning("Attenzione", "Nessun dato valido per le statistiche")
+            stats_window.destroy()
+            return
 
-    def save_report(self):
-        """Salva il report in formato testo"""
+        stats_text = f"""
+        Statistiche Analisi:
+
+        Numero file analizzati: {len(data)}
+
+        Importi:
+        - Totale: {sum(all_amounts):,.2f}
+        - Media: {sum(all_amounts) / len(all_amounts):,.2f}
+        - Minimo: {min(all_amounts):,.2f}
+        - Massimo: {max(all_amounts):,.2f}
+
+        Transazioni:
+        - Totale: {sum(all_txs):,d}
+        - Media: {sum(all_txs) / len(all_txs):,.2f}
+        - Minimo: {min(all_txs):,d}
+        - Massimo: {max(all_txs):,d}
+        """
+
+        text = tk.Text(stats_window, wrap=tk.WORD, padx=10, pady=10)
+        text.pack(fill=tk.BOTH, expand=True)
+        text.insert('1.0', stats_text)
+        text.config(state='disabled')
+
+    except Exception as e:
+        messagebox.showerror("Errore", f"Errore nel calcolo delle statistiche: {str(e)}")
+        stats_window.destroy()
+
+def reset_results(self):
+    """Resetta tutti i risultati e le visualizzazioni"""
+    # Pulisci tabella risultati
+    self.results_tree.delete(*self.results_tree.get_children())
+
+    # Resetta progress bar
+    self.progress_bar['value'] = 0
+    self.progress_label.config(text="")
+
+    # Pulisci grafico
+    self.figure.clear()
+    self.canvas.draw()
+
+    # Pulisci log
+    self.log_text.delete(1.0, tk.END)
+
+    # Resetta code
+    while not self.result_queue.empty():
         try:
-            if not self.result_text.get(1.0, tk.END).strip():
-                messagebox.showwarning("Attenzione", "Non ci sono risultati da salvare!")
-                return
-
-            file_path = filedialog.asksaveasfilename(
-                defaultextension=".txt",
-                filetypes=[("Text files", "*.txt")],
-                initialfile=f"report_analisi_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-            )
-
-            if file_path:
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    f.write(self.result_text.get(1.0, tk.END))
-                messagebox.showinfo("Successo", "Report salvato con successo!")
-
-        except Exception as e:
-            messagebox.showerror("Errore", f"Errore durante il salvataggio: {str(e)}")
-
-    def copy_results(self):
-        """Copia i risultati negli appunti"""
-        text = self.result_text.get(1.0, tk.END).strip()
-        if text:
-            self.frame.clipboard_clear()
-            self.frame.clipboard_append(text)
-            self.frame.update()
-            messagebox.showinfo("Info", "Risultati copiati negli appunti!")
-        else:
-            messagebox.showwarning("Attenzione", "Non ci sono risultati da copiare!")
-
-    def search(self, text):
-        """Ricerca nel contenuto (per ricerca globale)"""
-        results = []
-
-        # Cerca nei risultati testuali
-        content = self.result_text.get(1.0, tk.END).lower()
-        if text.lower() in content:
-            matches = []
-            for line in content.split('\n'):
-                if text.lower() in line.lower():
-                    matches.append(line.strip())
-            if matches:
-                results.append(("Analisi File", "\n".join(matches)))
-
-        # Cerca nella struttura ad albero
-        def search_tree(item=""):
-            found = []
-            item_text = self.tree.item(item, "text").lower()
-
-            if text.lower() in item_text:
-                found.append(item_text)
-
-            for child in self.tree.get_children(item):
-                found.extend(search_tree(child))
-
-            return found
-
-        tree_results = search_tree()
-        if tree_results:
-            results.append(("Struttura File", "\n".join(tree_results)))
-
-        return results
-
-    def process_result_queue(self):
-        """Processa i risultati nella coda"""
-        try:
-            while True:
-                result_type, data = self.result_queue.get_nowait()
-
-                if result_type == "text":
-                    self.result_text.insert(tk.END, data)
-                elif result_type == "tree":
-                    self.update_tree(data)
-                elif result_type == "json":
-                    self.update_tree_json(data)
-                elif result_type == "error":
-                    self.result_text.insert(tk.END, f"\nErrore: {data}\n")
-
-                self.result_text.see(tk.END)
-
+            self.result_queue.get_nowait()
         except Queue.Empty:
-            pass
-        finally:
-            # Programma il prossimo controllo della coda
-            self.frame.after(100, self.process_result_queue)
+            break
 
-    def update_tree(self, data, parent=""):
-        """Aggiorna la struttura ad albero per XML"""
-        item = self.tree.insert(parent, "end", text=data["tag"])
-
-        # Aggiungi attributi
-        if data["attributes"]:
-            attrs = self.tree.insert(item, "end", text="Attributi")
-            for key, value in data["attributes"].items():
-                self.tree.insert(attrs, "end", text=f"{key}: {value}")
-
-        # Aggiungi testo
-        if data["text"]:
-            self.tree.insert(item, "end", text=f"Testo: {data['text']}")
-
-        # Aggiungi figli ricorsivamente
-        for child in data["children"]:
-            self.update_tree(child, item)
-
-    def update_tree_json(self, data, parent=""):
-        """Aggiorna la struttura ad albero per JSON"""
-        if isinstance(data, dict):
-            for key, value in data.items():
-                item = self.tree.insert(parent, "end", text=key)
-                self.update_tree_json(value, item)
-        elif isinstance(data, list):
-            for i, value in enumerate(data):
-                item = self.tree.insert(parent, "end", text=f"[{i}]")
-                self.update_tree_json(value, item)
-        else:
-            self.tree.insert(parent, "end", text=str(data))
-
-    def get_file_info(self, file_path):
-        """Ottiene informazioni base sul file"""
+    while not self.log_queue.empty():
         try:
-            stats = os.stat(file_path)
-            return {
-                "size": stats.st_size,
-                "created": datetime.fromtimestamp(stats.st_ctime),
-                "modified": datetime.fromtimestamp(stats.st_mtime),
-                "accessed": datetime.fromtimestamp(stats.st_atime)
-            }
-        except Exception as e:
-            return {"error": str(e)}
+            self.log_queue.get_nowait()
+        except Queue.Empty:
+            break
+
+    self.log_queue.put(("INFO", "Risultati resettati"))

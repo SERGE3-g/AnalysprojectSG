@@ -112,7 +112,7 @@ class FiscalTab:
     def create_analyzer_tab(self):
         """Crea la scheda per l'analisi dei file"""
         analyze_frame = ttk.Frame(self.tabs)
-        self.tabs.add(analyze_frame, text='Analizza File')
+        self.tabs.add(analyze_frame, text='Analizza File Codice Fiscal')
 
         # Frame per caricamento file
         load_frame = ttk.LabelFrame(analyze_frame, text="Carica File", padding=10)
