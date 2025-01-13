@@ -1,0 +1,7 @@
+{
+    "theme": "clam",
+    "auto_backup": false,
+    "backup_interval": 30,
+    "last_backup": null,
+    "language": "it"
+}
