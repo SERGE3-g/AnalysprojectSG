@@ -165,3 +165,15 @@ class ValidationUtils:
         """Valida un indirizzo email"""
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return bool(re.match(pattern, email))
+
+    @staticmethod
+    def validate_phone(phone):
+        """Valida un numero di telefono"""
+        pattern = r'^\+?[\d\s-]{4,}$'
+        return bool(re.match(pattern, phone))
+
+    @staticmethod
+    def validate_zip_code(zip_code):
+        """Valida un codice postale"""
+        pattern = r'^\d{5}$'
+        return bool(re.match(pattern, zip_code))
