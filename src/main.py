@@ -1,68 +1,60 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, messagebox
 import os
 import sys
 from datetime import datetime
 import webbrowser
-import json
 from fiscal_analyzer import FiscalTab
 from file_analyzer import FileTab
 from inventory_manager import InventoryTab
+from sla_analyzer import SLATab
+from login import LoginWindow
 
 
 class MainApp:
     def __init__(self):
+        # Inizializzazione variabili utente
+        self.current_user = None
+        self.user_role = None
+
+        # Avvia il login
+        self.start_login()
+
+    def start_login(self):
+        """Avvia il processo di login"""
+        login = LoginWindow(self.on_login_success)
+        login.run()
+
+    def on_login_success(self, username, role):
+        """Callback per login riuscito"""
+        self.current_user = username
+        self.user_role = role
+        self.create_main_window()
+
+    def create_main_window(self):
+        """Crea la finestra principale dopo il login"""
         self.root = tk.Tk()
-        self.root.title("Multi-Tool Analyzer - SergeGuea")
+        self.root.title(f"Multi-Tool Analyzer - {self.current_user}")
         self.root.geometry("1200x800")
 
-        # Carica configurazioni
-        self.load_config()
+        # Inizializza variabili
+        self.status_var = tk.StringVar(value=f"Utente: {self.current_user} ({self.user_role})")
 
-        # Configurazione iniziale
+        # Setup interfaccia
         self.setup_style()
         self.create_menu()
         self.create_toolbar()
         self.create_gui()
 
-        # Setup backup automatico
-        if self.config.get('auto_backup', True):
-            self.schedule_backup()
-
-    def load_config(self):
-        """Carica le configurazioni dell'applicazione"""
-        try:
-            if os.path.exists('config.json'):
-                with open('config.json', 'r') as f:
-                    self.config = json.load(f)
-            else:
-                self.config = {
-                    'theme': 'clam',
-                    'auto_backup': True,
-                    'backup_interval': 30,
-                    'last_backup': None,
-                    'language': 'it'
-                }
-                self.save_config()
-        except Exception as e:
-            messagebox.showerror("Errore", f"Errore nel caricamento configurazioni: {str(e)}")
-            self.config = {}
-
-    def save_config(self):
-        """Salva le configurazioni"""
-        try:
-            with open('config.json', 'w') as f:
-                json.dump(self.config, f, indent=4)
-        except Exception as e:
-            messagebox.showerror("Errore", f"Errore nel salvataggio configurazioni: {str(e)}")
+        # Avvia l'applicazione
+        self.run()
 
     def setup_style(self):
         """Configura lo stile dell'applicazione"""
         self.style = ttk.Style()
-        current_theme = self.config.get('theme', 'clam')
-        self.style.theme_use(current_theme)
+        self.style.theme_use('clam')
 
-        # Header principale
+        # Header
         header = ttk.Label(
             self.root,
             text="Multi-Tool Analyzer",
@@ -79,29 +71,21 @@ class MainApp:
         # Menu File
         file_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="Backup Database", command=self.backup_data)
-        file_menu.add_command(label="Ripristina Backup", command=self.restore_backup)
-        file_menu.add_separator()
+
+        if self.user_role == 'admin':
+            file_menu.add_command(label="Gestione Utenti",
+                                  command=self.show_user_management)
+            file_menu.add_command(label="Impostazioni",
+                                  command=self.show_settings)
+            file_menu.add_separator()
+
+        file_menu.add_command(label="Logout", command=self.logout)
         file_menu.add_command(label="Esci", command=self.quit_app)
 
-        # Menu Visualizza
-        view_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="Visualizza", menu=view_menu)
-        view_menu.add_command(label="Tema Chiaro", command=lambda: self.change_theme('clam'))
-        view_menu.add_command(label="Tema Scuro", command=lambda: self.change_theme('alt'))
-
-        # Menu Strumenti
-        tools_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="Strumenti", menu=tools_menu)
-        tools_menu.add_command(label="Impostazioni", command=self.show_settings)
-
-        # Menu Aiuto
+        # Menu Help
         help_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="Aiuto", menu=help_menu)
+        menubar.add_cascade(label="Help", menu=help_menu)
         help_menu.add_command(label="Documentazione", command=self.show_docs)
-        help_menu.add_command(label="Supporto Online",
-                              command=lambda: webbrowser.open('https://github.com/SERGE3-g'))
-        help_menu.add_separator()
         help_menu.add_command(label="Info", command=self.show_about)
 
     def create_toolbar(self):
@@ -109,17 +93,11 @@ class MainApp:
         toolbar = ttk.Frame(self.root)
         toolbar.pack(fill='x', pady=1)
 
-        ttk.Button(toolbar, text="Backup", command=self.backup_data).pack(side='left', padx=2)
-        ttk.Button(toolbar, text="Impostazioni", command=self.show_settings).pack(side='left', padx=2)
-
-        # Separatore
-        ttk.Separator(toolbar, orient='vertical').pack(side='left', fill='y', padx=5, pady=2)
-
         # Ricerca globale
         ttk.Label(toolbar, text="Cerca:").pack(side='left', padx=2)
         self.search_var = tk.StringVar()
         self.search_var.trace('w', self.global_search)
-        ttk.Entry(toolbar, textvariable=self.search_var).pack(side='left', padx=2)
+        ttk.Entry(toolbar, textvariable=self.search_var).pack(side='left', padx=2, expand=True, fill='x')
 
     def create_gui(self):
         """Crea l'interfaccia principale"""
@@ -127,13 +105,13 @@ class MainApp:
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(expand=True, fill='both', padx=10, pady=5)
 
-        # Inizializzazione delle schede
+        # Creazione delle schede
         self.fiscal_tab = FiscalTab(self.notebook)
         self.file_tab = FileTab(self.notebook)
         self.inventory_tab = InventoryTab(self.notebook)
+        self.sla_tab = SLATab(self.notebook)
 
         # Status bar
-        self.status_var = tk.StringVar(value="Pronto")
         status = ttk.Label(self.root, textvariable=self.status_var)
         status.pack(side='bottom', fill='x', pady=2)
 
@@ -146,158 +124,35 @@ class MainApp:
         )
         footer.pack(side='bottom', fill='x')
 
-    def schedule_backup(self):
-        """Programma il backup automatico"""
-        interval = self.config.get('backup_interval', 30) * 60 * 1000  # minuti in ms
-        self.root.after(interval, self.auto_backup)
+    def logout(self):
+        """Gestisce il logout"""
+        if messagebox.askyesno("Logout", "Vuoi effettuare il logout?"):
+            self.root.destroy()
+            self.start_login()
 
-    def auto_backup(self):
-        """Esegue il backup automatico"""
-        try:
-            self.backup_data(silent=True)
-        finally:
-            self.schedule_backup()
-
-    def backup_data(self, silent=False):
-        """Esegue il backup dei dati"""
-        try:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            backup_dir = "backups"
-            if not os.path.exists(backup_dir):
-                os.makedirs(backup_dir)
-
-            # Backup del database e delle configurazioni
-            # TODO: Implementare la logica di backup specifica
-
-            if not silent:
-                messagebox.showinfo("Successo", "Backup completato con successo!")
-
-        except Exception as e:
-            if not silent:
-                messagebox.showerror("Errore", f"Errore durante il backup: {str(e)}")
-
-    def restore_backup(self):
-        """Ripristina un backup"""
-        # TODO: Implementare il ripristino del backup
-        pass
-
-    def change_theme(self, theme_name):
-        """Cambia il tema dell'applicazione"""
-        try:
-            self.style.theme_use(theme_name)
-            self.config['theme'] = theme_name
-            self.save_config()
-        except Exception as e:
-            messagebox.showerror("Errore", f"Errore nel cambio tema: {str(e)}")
+    def quit_app(self):
+        """Chiude l'applicazione"""
+        if messagebox.askokcancel("Esci", "Vuoi davvero uscire dall'applicazione?"):
+            try:
+                self.root.quit()
+                sys.exit(0)
+            except:
+                sys.exit(0)
 
     def show_settings(self):
         """Mostra la finestra delle impostazioni"""
-        settings_window = tk.Toplevel(self.root)
-        settings_window.title("Impostazioni")
-        settings_window.geometry("400x300")
+        messagebox.showinfo("Info", "Funzionalità in sviluppo")
 
-        # Backup automatico
-        auto_backup_var = tk.BooleanVar(value=self.config.get('auto_backup', True))
-        ttk.Checkbutton(
-            settings_window,
-            text="Backup automatico",
-            variable=auto_backup_var,
-            command=lambda: self.config.update({'auto_backup': auto_backup_var.get()})
-        ).pack(pady=5)
-
-        # Intervallo backup
-        frame = ttk.Frame(settings_window)
-        frame.pack(pady=5)
-        ttk.Label(frame, text="Intervallo backup (minuti):").pack(side='left')
-        interval_var = tk.StringVar(value=str(self.config.get('backup_interval', 30)))
-        ttk.Entry(frame, textvariable=interval_var).pack(side='left')
-
-        # Pulsante salva
-        ttk.Button(
-            settings_window,
-            text="Salva",
-            command=lambda: self.save_settings(auto_backup_var.get(), interval_var.get())
-        ).pack(pady=10)
-
-    def save_settings(self, auto_backup, interval):
-        """Salva le impostazioni"""
-        try:
-            self.config.update({
-                'auto_backup': auto_backup,
-                'backup_interval': int(interval)
-            })
-            self.save_config()
-            messagebox.showinfo("Successo", "Impostazioni salvate con successo!")
-        except ValueError:
-            messagebox.showerror("Errore", "L'intervallo deve essere un numero intero")
+    def show_user_management(self):
+        """Mostra la gestione utenti (solo admin)"""
+        if self.user_role != 'admin':
+            messagebox.showerror("Errore", "Accesso non autorizzato")
+            return
+        messagebox.showinfo("Info", "Gestione utenti in sviluppo")
 
     def show_docs(self):
         """Mostra la documentazione"""
-        docs = tk.Toplevel(self.root)
-        docs.title("Documentazione")
-        docs.geometry("800x600")
-
-        text = tk.Text(docs, wrap='word', padx=10, pady=10)
-        text.pack(fill='both', expand=True)
-
-        docs_text = """
-        Multi-Tool Analyzer
-        ===================
-
-        Descrizione
-        -----------
-        Il Multi-Tool Analyzer è un'applicazione completa e versatile progettata per semplificare la gestione e l'analisi di dati tramite diverse funzionalità integrate. È uno strumento ideale per chi cerca un'interfaccia unica per gestire compiti amministrativi, analizzare file, elaborare codici fiscali e molto altro.
-
-        Funzionalità Principali
-        -----------------------
-        - **Analisi Codici Fiscali**
-          Esegui l'analisi e la validazione dei codici fiscali in modo rapido ed efficiente.
-
-        - **Gestione File**
-          Strumenti per la lettura e la manipolazione di file, organizzati in un'interfaccia user-friendly.
-
-        - **Gestione Inventario**
-          Gestisci e organizza facilmente i tuoi inventari con strumenti avanzati per il monitoraggio e l'archiviazione.
-
-        Requisiti di Sistema
-        --------------------
-        - Sistema operativo: Windows, macOS, Linux
-        - Python 3.6 (o versioni successive)
-        - Moduli necessari:
-          - tkinter (per l'interfaccia)
-          - json (per la gestione delle configurazioni)
-          - pandas (per l'elaborazione dei dati)
-          - reportlab (per la generazione di PDF)
-
-        Installazione
-        -------------
-        1. Clona o scarica il repository dal seguente link:
-           https://github.com/SERGE3-g
-
-        2. Assicurati che i moduli richiesti siano installati:
-           ```bash
-           pip install -r requirements.txt
-           ```
-
-        3. Avvia l'applicazione con:
-           ```bash
-           python main.py
-           ```
-
-        Supporto
-        --------
-        Per segnalare problemi o per ulteriore assistenza, visita il repository ufficiale del progetto:
-        [GitHub - Multi-Tool Analyzer](https://github.com/SERGE3-g)
-
-        Licenza
-        -------
-        © 2025 SergeGuea. Tutti i diritti riservati.
-
-        L'uso di questo software è regolato dalla licenza fornita nel repository online.
-        """
-
-        text.insert('1.0', docs_text)
-        text.config(state='disabled')
+        webbrowser.open('https://github.com/SERGE3-g')
 
     def show_about(self):
         """Mostra informazioni sull'applicazione"""
@@ -314,21 +169,48 @@ class MainApp:
 
     def global_search(self, *args):
         """Esegue una ricerca globale"""
-        search_text = self.search_var.get().strip().lower()
+        search_text = self.search_var.get().lower()
         if len(search_text) < 3:
             return
 
         self.status_var.set(f"Ricerca in corso: {search_text}")
-        # TODO: Implementare la logica di ricerca globale
+        results = []
 
-    def quit_app(self):
-        """Chiude l'applicazione"""
-        if messagebox.askokcancel("Esci", "Vuoi davvero uscire dall'applicazione?"):
+        # Cerca in ogni tab
+        for tab in [self.fiscal_tab, self.file_tab, self.inventory_tab, self.sla_tab]:
             try:
-                self.backup_data(silent=True)
-                self.root.quit()
+                tab_results = tab.search(search_text)
+                if tab_results:
+                    results.extend(tab_results)
             except Exception as e:
-                messagebox.showerror("Errore", f"Errore durante la chiusura: {str(e)}")
+                print(f"Errore nella ricerca: {str(e)}")
+
+        if results:
+            self.show_search_results(results)
+        else:
+            self.status_var.set("Nessun risultato trovato")
+
+    def show_search_results(self, results):
+        """Mostra i risultati della ricerca"""
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Risultati Ricerca")
+        dialog.geometry("600x400")
+
+        # Text widget con scrollbar
+        frame = ttk.Frame(dialog, padding="5")
+        frame.pack(fill='both', expand=True)
+
+        text = tk.Text(frame, wrap=tk.WORD)
+        scrollbar = ttk.Scrollbar(frame, orient='vertical', command=text.yview)
+        text.configure(yscrollcommand=scrollbar.set)
+
+        text.pack(side='left', fill='both', expand=True)
+        scrollbar.pack(side='right', fill='y')
+
+        for title, content in results:
+            text.insert('end', f"\n=== {title} ===\n{content}\n")
+
+        text.config(state='disabled')
 
     def run(self):
         """Avvia l'applicazione"""
@@ -340,25 +222,12 @@ class MainApp:
             y = (screen_height - 800) // 2
             self.root.geometry(f"1200x800+{x}+{y}")
 
-            # Avvio
             self.root.mainloop()
 
         except Exception as e:
-            messagebox.showerror("Errore", f"Si è verificato un errore: {str(e)}")
+            messagebox.showerror("Errore", f"Errore durante l'esecuzione: {str(e)}")
             sys.exit(1)
 
 
 if __name__ == "__main__":
-    try:
-        # Verifica directory necessarie
-        for dir_name in ['backups', 'data', 'logs']:
-            if not os.path.exists(dir_name):
-                os.makedirs(dir_name)
-
-        # Avvio applicazione
-        app = MainApp()
-        app.run()
-
-    except Exception as e:
-        print(f"Errore durante l'avvio: {str(e)}")
-        sys.exit(1)
+    app = MainApp()
