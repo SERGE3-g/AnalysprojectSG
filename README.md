@@ -1,5 +1,3 @@
-[Sezioni precedenti rimangono invariate, aggiungiamo:]
-
 ## Architettura del Software
 ### Design Pattern
 - **MVC (Model-View-Controller)**
