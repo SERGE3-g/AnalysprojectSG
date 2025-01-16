@@ -352,24 +352,20 @@ class FileTab:
         """Elabora i file selezionati"""
         try:
             self.log_queue.put(("INFO", "Avvio analisi..."))
-
             data = []
             total_files = len(files)
             errors = []
 
             for i, file_path in enumerate(files, 1):
                 try:
-                    # Aggiorna progresso
-                    self.update_progress(i, total_files)
+                    # Aggiorna progresso usando after
+                    self.frame.after(0, self.update_progress, i, total_files)
 
                     # Analizza file
                     results = self.parse_file(file_path)
-
-                    # Applica filtri se necessario
                     results = self.apply_filters(results)
 
                     if results:
-                        # Aggiungi info file
                         file_data = {
                             'file': os.path.basename(file_path),
                             'results': results,
@@ -377,46 +373,35 @@ class FileTab:
                             'status': 'OK'
                         }
                         data.append(file_data)
-
-                        # Aggiorna visualizzazioni
-                        self.result_queue.put(("update_tree", file_data))
+                        # Aggiorna UI usando after
+                        self.frame.after(0, lambda d=file_data: self.result_queue.put(("update_tree", d)))
 
                 except Exception as e:
                     errors.append((file_path, str(e)))
-                    self.log_queue.put(
-                        ("ERROR", f"Errore nell'analisi di {file_path}: {str(e)}")
-                    )
+                    self.frame.after(0, lambda msg=f"Errore nell'analisi di {file_path}: {str(e)}":
+                    self.log_queue.put(("ERROR", msg)))
 
             if data:
                 # Crea report Excel
                 self.create_excel_report(data, output_excel)
-
-                # Aggiorna grafico
-                self.result_queue.put(("update_chart", data))
-
-                self.log_queue.put(
-                    ("SUCCESS", f"Analisi completata. File salvato: {output_excel}")
-                )
-                messagebox.showinfo(
-                    "Successo",
-                    f"Analisi completata. File salvato: {output_excel}"
-                )
+                # Aggiorna grafico usando after
+                self.frame.after(0, lambda d=data: self.result_queue.put(("update_chart", d)))
+                self.frame.after(0, lambda: self.log_queue.put(
+                    ("SUCCESS", f"Analisi completata. File salvato: {output_excel}")))
+                self.frame.after(0, lambda: messagebox.showinfo(
+                    "Successo", f"Analisi completata. File salvato: {output_excel}"))
             else:
-                self.log_queue.put(("WARNING", "Nessun dato trovato nei file"))
-                messagebox.showwarning(
-                    "Attenzione",
-                    "Nessun dato trovato nei file analizzati"
-                )
+                self.frame.after(0, lambda: messagebox.showwarning(
+                    "Attenzione", "Nessun dato trovato nei file analizzati"))
 
             if errors:
-                self.show_errors_dialog(errors)
+                self.frame.after(0, lambda: self.show_errors_dialog(errors))
 
         except Exception as e:
-            self.log_queue.put(("ERROR", f"Errore durante l'analisi: {str(e)}"))
-            messagebox.showerror("Errore", str(e))
+            self.frame.after(0, lambda: messagebox.showerror("Errore", str(e)))
 
         finally:
-            self.start_button.config(state=tk.NORMAL)
+            self.frame.after(0, lambda: self.start_button.config(state=tk.NORMAL))
 
     def parse_file(self, file_path):
         """Analizza il file per estrarre i valori"""

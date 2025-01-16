@@ -3,6 +3,8 @@ from tkinter import ttk, filedialog, messagebox
 import pandas as pd
 from datetime import datetime
 import os
+
+import self
 from docx import Document
 from docx.shared import RGBColor
 from docx.shared import Inches
@@ -324,108 +326,119 @@ class SLATab:
     def generate_docx_report(self, results, output_path):
         """Genera il report Word"""
         try:
-            # Debug log per vedere la struttura dei dati
-            self.log(f"Struttura results: {results}")
-
             doc = Document()
 
             # Titolo
-            doc.add_heading(
+            title = doc.add_heading(
                 f'Report SLA - {self.month_var.get()} {self.year_var.get()}', 0
-            ).alignment = WD_ALIGN_PARAGRAPH.CENTER
+            )
+            title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
             # Data generazione
             doc.add_paragraph(f"Data generazione: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
             doc.add_paragraph()
 
+            # Riepilogo Generale
+            doc.add_heading('Riepilogo Generale', level=1)
+            summary_table = doc.add_table(rows=1, cols=3)
+            summary_table.style = 'Table Grid'
+            header_cells = summary_table.rows[0].cells
+            header_cells[0].text = 'SLA'
+            header_cells[1].text = 'Stato'
+            header_cells[2].text = 'Conformità'
+
+            total_slas = 0
+            compliant_slas = 0
+
             # Analisi per ogni SLA
             for sla_name, data in results.items():
                 try:
-                    # Verifica che data contenga tutte le chiavi necessarie
-                    required_keys = ['total_records', 'compliant_records', 'non_compliant_records']
-                    missing_keys = [key for key in required_keys if key not in data]
-                    if missing_keys:
-                        self.log(f"Dati mancanti per {sla_name}: {missing_keys}", "error")
-                        continue  # Salta questo SLA e continua con il prossimo
+                    # Verifica che i dati siano presenti
+                    if not data or 'total_records' not in data:
+                        self.log(f"Dati mancanti per {sla_name}", "error")
+                        continue
 
-                    # Prova prima con _IN
-                    file_key = f"{sla_name}_IN"
-                    if file_key not in self.files:
-                        file_key = f"{sla_name}_OUT"
+                    total_slas += 1
+                    total_records = data['total_records']
+                    compliant_records = data.get('compliant_records', 0)
 
-                    if file_key not in self.files:
-                        self.log(f"Nessun file trovato per {sla_name} (cercato {file_key})", "error")
-                        continue  # Salta questo SLA e continua con il prossimo
-
-                    # Log per debug
-                    self.log(f"Generando report per {sla_name} con chiave {file_key}")
-
-                    # Intestazione sezione
-                    doc.add_heading(f'Analisi {sla_name}', level=1)
-
-                    # Informazioni generali
-                    doc.add_paragraph(f"Soglia: {self.thresholds[sla_name]}")
-                    doc.add_paragraph(f"File analizzato: {os.path.basename(self.files[file_key]['path'])}")
-                    doc.add_paragraph()
-
-                    # Statistiche principali
-                    doc.add_paragraph(f"Totale record analizzati: {data['total_records']}")
-                    doc.add_paragraph(f"Record conformi: {data['compliant_records']}")
-                    doc.add_paragraph(f"Record non conformi: {data['non_compliant_records']}")
-                    doc.add_paragraph()
-
-                    # Percentuale di conformità
-                    if data['total_records'] > 0:
-                        compliance_percentage = (data['compliant_records'] / data['total_records'] * 100)
+                    # Calcola la percentuale di conformità
+                    if total_records > 0:
+                        compliance_percentage = (compliant_records / total_records) * 100
                     else:
                         compliance_percentage = 0
+
+                    # Determina lo stato SLA
+                    threshold = self.thresholds[sla_name]
+                    is_compliant = compliance_percentage >= threshold
+                    if is_compliant:
+                        compliant_slas += 1
+
+                    # Aggiungi riga alla tabella di riepilogo
+                    row_cells = summary_table.add_row().cells
+                    row_cells[0].text = sla_name
+                    row_cells[1].text = 'CONFORME' if is_compliant else 'NON CONFORME'
+                    row_cells[2].text = f"{compliance_percentage:.2f}%"
+
+                    # Dettagli specifici SLA
+                    doc.add_heading(f'Analisi {sla_name}', level=2)
+                    doc.add_paragraph(f"Soglia di conformità: {threshold}%")
+                    doc.add_paragraph(f"Record totali analizzati: {total_records}")
+                    doc.add_paragraph(f"Record conformi: {compliant_records}")
+                    doc.add_paragraph(f"Record non conformi: {total_records - compliant_records}")
                     doc.add_paragraph(f"Percentuale di conformità: {compliance_percentage:.2f}%")
 
-                    # Stato SLA
-                    threshold = float(self.thresholds[sla_name])
-                    status = "RISPETTATO" if compliance_percentage >= threshold else "NON RISPETTATO"
-                    p = doc.add_paragraph(f"Stato SLA: {status}")
+                    # Stato SLA con formattazione colorata
+                    p = doc.add_paragraph("Stato SLA: ")
+                    status_run = p.add_run("CONFORME" if is_compliant else "NON CONFORME")
+                    status_run.font.color.rgb = RGBColor(0, 128, 0) if is_compliant else RGBColor(255, 0, 0)
+                    status_run.bold = True
 
-                    # Applica formattazione colorata allo stato
-                    run = p.runs[-1]
-                    run.font.color.rgb = RGBColor(0, 128, 0) if status == "RISPETTATO" else RGBColor(255, 0, 0)
-                    run.font.bold = True
+                    # Aggiungi grafici o visualizzazioni se disponibili
+                    if 'trend_data' in data:
+                        # Qui puoi aggiungere grafici o visualizzazioni
+                        pass
 
-                    # Aggiungi una linea vuota tra le sezioni
-                    doc.add_paragraph()
+                    # Aggiungi dettagli non conformità se presenti
+                    if not is_compliant and 'non_compliant_details' in data:
+                        doc.add_heading("Dettaglio Non Conformità", level=3)
+                        details_table = doc.add_table(rows=1, cols=3)
+                        details_table.style = 'Table Grid'
+                        details_header = details_table.rows[0].cells
+                        details_header[0].text = 'Data/Ora'
+                        details_header[1].text = 'Valore'
+                        details_header[2].text = 'Deviazione'
 
-                    # Se ci sono record non conformi, aggiungi i dettagli
-                    if data.get('non_compliant_records', 0) > 0 and 'non_compliant_details' in data and data[
-                        'non_compliant_details']:
-                        doc.add_heading("Dettaglio record non conformi", level=2)
+                        for detail in data['non_compliant_details'][:10]:  # Mostra primi 10 dettagli
+                            row_cells = details_table.add_row().cells
+                            row_cells[0].text = str(detail.get('timestamp', 'N/A'))
+                            row_cells[1].text = str(detail.get('value', 'N/A'))
+                            row_cells[2].text = str(detail.get('deviation', 'N/A'))
 
-                        # Verifica che ci siano dettagli e che abbiano la struttura corretta
-                        if data['non_compliant_details'] and isinstance(data['non_compliant_details'], list):
-                            # Crea tabella per i dettagli
-                            table = doc.add_table(rows=1, cols=len(data['non_compliant_details'][0]))
-                            table.style = 'Table Grid'
-
-                            # Intestazioni tabella
-                            headers = list(data['non_compliant_details'][0].keys())
-                            header_cells = table.rows[0].cells
-                            for i, header in enumerate(headers):
-                                header_cells[i].text = header
-                                header_cells[i].paragraphs[0].runs[0].font.bold = True
-
-                            # Aggiungi righe con i dettagli
-                            for detail in data['non_compliant_details']:
-                                row_cells = table.add_row().cells
-                                for i, key in enumerate(headers):
-                                    row_cells[i].text = str(detail[key])
-
-                        doc.add_paragraph()
+                    doc.add_paragraph()  # Spazio tra sezioni
 
                 except Exception as e:
-                    self.log(f"Errore nella generazione della sezione per {sla_name}: {str(e)}", "error")
-                    # Continua con il prossimo SLA invece di interrompere tutto
+                    self.log(f"Errore nell'elaborazione di {sla_name}: {str(e)}", "error")
                     continue
 
-            # Salva il documento solo se abbiamo generato almeno una sezione
+            # Aggiungi statistiche globali
+            doc.add_heading('Statistiche Globali', level=1)
+            stats_table = doc.add_table(rows=3, cols=2)
+            stats_table.style = 'Table Grid'
+
+            cells = stats_table.rows[0].cells
+            cells[0].text = 'Totale SLA Analizzati'
+            cells[1].text = str(total_slas)
+
+            cells = stats_table.rows[1].cells
+            cells[0].text = 'SLA Conformi'
+            cells[1].text = str(compliant_slas)
+
+            cells = stats_table.rows[2].cells
+            cells[0].text = 'Percentuale Globale Conformità'
+            cells[1].text = f"{(compliant_slas / total_slas * 100):.2f}%" if total_slas > 0 else "N/A"
+
+            # Salva il documento
             doc.save(output_path)
             return True
 
@@ -449,6 +462,24 @@ class SLATab:
         self.log_text.insert(tk.END, f"{timestamp}: {message}\n", level)
         self.log_text.see(tk.END)
 
+    def get_save_path(self):
+        """Chiede all'utente dove salvare il report"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        default_filename = f"SLA_Report_{self.month_var.get()}_{self.year_var.get()}_{timestamp}.docx"
+
+        save_path = filedialog.asksaveasfilename(
+            defaultextension=".docx",
+            filetypes=[("Word documents", "*.docx")],
+            initialfile=default_filename,
+            title="Salva Report SLA"
+        )
+
+        if save_path:
+            # Assicurati che il percorso esista
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            return save_path
+        return None
+
     def generate_report(self):
         """Genera il report completo"""
         try:
@@ -462,25 +493,31 @@ class SLATab:
             self.log("Inizio generazione report...", "info")
 
             # Crea directory reports se non esiste
-            reports_dir = "reports"
-            if not os.path.exists(reports_dir):
-                os.makedirs(reports_dir)
+            reports_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "reports")
+            os.makedirs(reports_dir, exist_ok=True)
+
+            # Genera nome file univoco
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            base_filename = f"SLA_Report_{self.month_var.get()}_{self.year_var.get()}"
+            output_path = os.path.join(reports_dir, f"{base_filename}_{timestamp}.docx")
+
+            # Se il file esiste già, aggiungi un numero incrementale
+            counter = 1
+            while os.path.exists(output_path):
+                output_path = os.path.join(reports_dir, f"{base_filename}_{timestamp}_{counter}.docx")
+                counter += 1
 
             # Analisi dei dati
             results = {}
             for sla_name, threshold in self.thresholds.items():
-                # Correggi la logica per determinare il file corretto
                 file_key = f"{sla_name}_OUT" if sla_name in ['SLA2', 'SLA3'] else f"{sla_name}_IN"
                 file_path = self.files[file_key]['path']
 
                 try:
-                    # Leggi e prepara i dati
                     df = pd.read_csv(file_path, sep=';')
                     df['Time'] = pd.to_datetime(df['Time'], format='%d/%m/%Y %H:%M', dayfirst=True)
-                    df[sla_name] = pd.to_numeric(df[sla_name], errors='coerce')
                     df.set_index('Time', inplace=True)
 
-                    # Analizza i dati
                     self.log(f"Analisi {sla_name}...", "info")
                     results[sla_name] = self.analyze_sla_data(df, threshold, sla_name)
 
@@ -489,64 +526,82 @@ class SLATab:
                     raise
 
             # Genera report
-            output_path = os.path.join(reports_dir, f"SLA_Report_{self.month_var.get()}_{self.year_var.get()}.docx")
             self.generate_docx_report(results, output_path)
 
             self.log(f"Report generato con successo: {output_path}", "success")
             messagebox.showinfo("Successo", f"Report generato: {output_path}")
 
+            # Apri il report automaticamente
+            try:
+                os.startfile(output_path)
+            except Exception as e:
+                self.log(f"Impossibile aprire il report automaticamente: {str(e)}", "warning")
+                messagebox.showinfo("Info", "Il report è stato generato ma non può essere aperto automaticamente.")
+
         except Exception as e:
             self.log(f"Errore nella generazione del report: {str(e)}", "error")
             messagebox.showerror("Errore", str(e))
 
-    def analyze_sla_data(self, df, threshold, column_name):
-        """Analizza i dati SLA"""
+
+    def analyze_sla_data(self, df, threshold, sla_name):
+        """Analizza i dati SLA e prepara i risultati per il report"""
         try:
-            # Log per debug
-            self.log(f"Analisi dati per {column_name}")
-            self.log(f"Dimensioni dataset: {df.shape}")
-            self.log(f"Colonne presenti: {df.columns.tolist()}")
+            total_records = len(df)
+            if total_records == 0:
+                return {
+                    'total_records': 0,
+                    'compliant_records': 0,
+                    'non_compliant_records': 0,
+                    'compliance_percentage': 0,
+                    'non_compliant_details': []
+                }
 
-            daily_stats = []
-            grouped = df.groupby(df.index.date)
+            # Assicurati che la colonna esista
+            if sla_name not in df.columns:
+                self.log(f"Colonna {sla_name} non trovata nel DataFrame", "error")
+                raise KeyError(f"Colonna {sla_name} non trovata")
 
-            for date, group in grouped:
-                total_minutes = len(group)
-                # Assicurati che i valori siano numerici
-                over_threshold = len(group[pd.to_numeric(group[column_name], errors='coerce') > threshold])
-                percentage = ((total_minutes - over_threshold) / total_minutes) * 100
+            # Converti i valori in numerici, gestendo eventuali errori
+            df[sla_name] = pd.to_numeric(df[sla_name], errors='coerce')
 
-                daily_stats.append({
-                    'Data': date,
-                    'Min con Operatività oltre soglia': over_threshold,
-                    'Min con Operatività': total_minutes,
-                    '%': percentage
-                })
+            # Identifica record conformi e non conformi
+            non_compliant_mask = df[sla_name] > threshold
+            compliant_records = total_records - non_compliant_mask.sum()
+            non_compliant_records = non_compliant_mask.sum()
 
-            return pd.DataFrame(daily_stats)
+            # Calcola la percentuale di conformità
+            compliance_percentage = (compliant_records / total_records * 100) if total_records > 0 else 0
+
+            # Raccogli dettagli dei record non conformi
+            non_compliant_details = []
+            if non_compliant_records > 0:
+                non_compliant_df = df[non_compliant_mask].copy()
+                for idx, row in non_compliant_df.iterrows():
+                    detail = {
+                        'timestamp': idx.strftime('%Y-%m-%d %H:%M:%S'),
+                        'value': row[sla_name],
+                        'deviation': row[sla_name] - threshold
+                    }
+                    non_compliant_details.append(detail)
+
+            # Prepara i risultati
+            results = {
+                'total_records': total_records,
+                'compliant_records': int(compliant_records),
+                'non_compliant_records': int(non_compliant_records),
+                'compliance_percentage': float(compliance_percentage),
+                'non_compliant_details': non_compliant_details,
+                'trend_data': {
+                    'timestamps': df.index.tolist(),
+                    'values': df[sla_name].tolist()
+                }
+            }
+
+            return results
 
         except Exception as e:
-            self.log(f"Errore nell'analisi dei dati per {column_name}: {str(e)}", "error")
+            self.log(f"Errore nell'analisi dei dati per {sla_name}: {str(e)}", "error")
             raise
-
-    def analyze_sla_data(self, df, threshold, column_name):
-        """Analizza i dati SLA"""
-        daily_stats = []
-        grouped = df.groupby(df.index.date)
-
-        for date, group in grouped:
-            total_minutes = len(group)
-            over_threshold = len(group[group[column_name] > threshold])
-            percentage = ((total_minutes - over_threshold) / total_minutes) * 100
-
-            daily_stats.append({
-                'Data': date,
-                'Min con Operatività oltre soglia': over_threshold,
-                'Min con Operatività': total_minutes,
-                '%': percentage
-            })
-
-        return pd.DataFrame(daily_stats)
 
     def search(self, text):
         """Implementa la ricerca globale nei dati SLA"""
@@ -631,3 +686,4 @@ class SLATab:
         self.log(f"Ricerca eseguita per: {text} - Trovati {len(results)} risultati", "info")
 
         return results
+
