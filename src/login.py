@@ -3,58 +3,78 @@ from tkinter import ttk, messagebox
 import sqlite3
 import hashlib
 import os
+from datetime import datetime
 
 
 class LoginManager:
     def __init__(self):
+        self.db_path = 'data/users.db'
         self.setup_database()
 
     def setup_database(self):
-        """Inizializza il database per gli utenti"""
-        if not os.path.exists('data'):
-            os.makedirs('data')
-
-        conn = sqlite3.connect('data/users.db')
-        cursor = conn.cursor()
-
-        # Crea tabella utenti se non esiste
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                role TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-
-        # Crea utente admin di default se non esiste
-        cursor.execute("SELECT * FROM users WHERE username = 'admin'")
-        if not cursor.fetchone():
-            hashed_password = hashlib.sha256('admin123'.encode()).hexdigest()
-            cursor.execute('''
-                INSERT INTO users (username, password, role)
-                VALUES (?, ?, ?)
-            ''', ('admin', hashed_password, 'admin'))
-
-        conn.commit()
-        conn.close()
+        """Verifica che il database esista"""
+        if not os.path.exists(self.db_path):
+            from init_db import initialize_database
+            initialize_database()
 
     def verify_login(self, username, password):
         """Verifica le credenziali di login"""
-        conn = sqlite3.connect('data/users.db')
-        cursor = conn.cursor()
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
 
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        cursor.execute('''
-            SELECT role FROM users 
-            WHERE username = ? AND password = ?
-        ''', (username, hashed_password))
+            # Hash della password
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
-        result = cursor.fetchone()
-        conn.close()
+            # Verifica credenziali e stato attivo
+            cursor.execute('''
+                SELECT id, role 
+                FROM users 
+                WHERE username = ? 
+                AND password = ? 
+                AND is_active = 1
+            ''', (username, hashed_password))
 
-        return result[0] if result else None
+            result = cursor.fetchone()
+
+            if result:
+                user_id, role = result
+
+                # Aggiorna last_login
+                cursor.execute('''
+                    UPDATE users 
+                    SET last_login = CURRENT_TIMESTAMP 
+                    WHERE id = ?
+                ''', (user_id,))
+
+                # Log dell'accesso
+                cursor.execute('''
+                    INSERT INTO access_logs (user_id, action)
+                    VALUES (?, ?)
+                ''', (user_id, 'login_success'))
+
+                conn.commit()
+                conn.close()
+                return role
+
+            # Log del tentativo fallito
+            cursor.execute('''
+                SELECT id FROM users WHERE username = ?
+            ''', (username,))
+            user_result = cursor.fetchone()
+            if user_result:
+                cursor.execute('''
+                    INSERT INTO access_logs (user_id, action)
+                    VALUES (?, ?)
+                ''', (user_result[0], 'login_failed'))
+                conn.commit()
+
+            conn.close()
+            return None
+
+        except sqlite3.Error as e:
+            print(f"Errore database: {e}")
+            return None
 
 
 class LoginWindow:
@@ -151,8 +171,8 @@ class LoginWindow:
 
     def login(self):
         """Gestisce il processo di login"""
-        username = self.username_var.get()
-        password = self.password_var.get()
+        username = self.username_var.get().strip()
+        password = self.password_var.get().strip()
 
         if not username or not password:
             messagebox.showerror("Errore", "Inserisci username e password")
@@ -164,9 +184,19 @@ class LoginWindow:
             self.root.destroy()
             self.on_login_success(username, role)
         else:
-            messagebox.showerror("Errore", "Credenziali non valide")
+            messagebox.showerror("Errore", "Credenziali non valide o account disattivato")
             self.password_var.set("")  # Pulisce solo la password
 
     def run(self):
         """Avvia la finestra di login"""
         self.root.mainloop()
+
+
+# Test solo se eseguito direttamente
+if __name__ == "__main__":
+    def on_login_success(username, role):
+        print(f"Login effettuato: {username} ({role})")
+
+
+    login_window = LoginWindow(on_login_success)
+    login_window.run()
