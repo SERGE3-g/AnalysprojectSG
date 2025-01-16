@@ -1,6 +1,6 @@
 {
     "theme": "alt",
-    "auto_backup": false,
+    "auto_backup": true,
     "backup_interval": 30,
     "last_backup": null,
     "language": "it"
