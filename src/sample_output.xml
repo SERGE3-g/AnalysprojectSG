@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generated="20240117 12:34:56.789" generator="Robot 6.1.1 (Python 3.10.0 on win32)">
+<suite id="s1" name="Sample Test Suite">
+<test id="t1" name="Test 1">
+    <status status="PASS" starttime="20240117 12:34:57.123" endtime="20240117 12:34:58.456">Test passed</status>
+    <tags>
+        <tag>smoke</tag>
+        <tag>regression</tag>
+    </tags>
+</test>
+<test id="t2" name="Test 2">
+    <status status="FAIL" starttime="20240117 12:34:59.123" endtime="20240117 12:35:00.456">Test failed</status>
+    <tags>
+        <tag>regression</tag>
+    </tags>
+</test>
+<test id="t3" name="Test 3">
+    <status status="PASS" starttime="20240117 12:35:01.123" endtime="20240117 12:35:02.456">Test passed</status>
+    <tags>
+        <tag>smoke</tag>
+    </tags>
+</test>
+<status status="FAIL" starttime="20240117 12:34:56.789" endtime="20240117 12:35:03.456"/>
+</suite>
+</robot>

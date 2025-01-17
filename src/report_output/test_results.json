@@ -1,0 +1,61 @@
+{
+  "name": "Sample Test Suite",
+  "doc": "",
+  "status": "FAIL",
+  "message": "",
+  "start_time": "",
+  "end_time": "",
+  "elapsed_time": 0.0,
+  "tests": [
+    {
+      "name": "Test 1",
+      "status": "PASS",
+      "message": "",
+      "times": {
+        "start_time": "",
+        "end_time": "",
+        "elapsed_time": 0.0
+      },
+      "tags": [
+        "smoke",
+        "regression"
+      ],
+      "doc": "",
+      "is_critical": true
+    },
+    {
+      "name": "Test 2",
+      "status": "FAIL",
+      "message": "",
+      "times": {
+        "start_time": "",
+        "end_time": "",
+        "elapsed_time": 0.0
+      },
+      "tags": [
+        "regression"
+      ],
+      "doc": "",
+      "is_critical": true
+    },
+    {
+      "name": "Test 3",
+      "status": "PASS",
+      "message": "",
+      "times": {
+        "start_time": "",
+        "end_time": "",
+        "elapsed_time": 0.0
+      },
+      "tags": [
+        "smoke"
+      ],
+      "doc": "",
+      "is_critical": true
+    }
+  ],
+  "total_tests": 3,
+  "passed_tests": 2,
+  "failed_tests": 1,
+  "metadata": {}
+}
