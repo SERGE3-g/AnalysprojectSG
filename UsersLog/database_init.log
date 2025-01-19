@@ -1,0 +1,90 @@
+2025-01-18 12:13:26,428 - INFO - Directory base del progetto: /Users/sergeguea/PycharmProjects
+2025-01-18 12:13:26,428 - INFO - Directory data: /Users/sergeguea/PycharmProjects/data
+2025-01-18 12:13:26,428 - INFO - File database: /Users/sergeguea/PycharmProjects/data/users.db
+2025-01-18 12:13:26,740 - INFO - === Avvio Applicazione ===
+2025-01-18 12:13:26,740 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-18 12:13:26,740 - INFO - Sistema operativo: posix
+2025-01-18 12:13:26,740 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-18 12:13:26,740 - INFO - Directory base: /Users/sergeguea/PycharmProjects/AnalysprojectSG
+2025-01-18 12:13:26,740 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data
+2025-01-18 12:13:26,740 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data/users.db
+2025-01-18 12:13:26,740 - INFO - Database non trovato. Inizializzazione...
+2025-01-18 12:13:26,740 - INFO - Inizializzazione del database...
+2025-01-18 12:13:26,741 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-18 12:13:26,744 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-18 12:13:26,745 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-18 12:13:26,745 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-18 12:13:26,745 - INFO - Utente admin creato (se non già presente).
+2025-01-18 12:13:26,746 - INFO - Database inizializzato con successo!
+2025-01-18 12:13:26,746 - INFO - Avvio test del database...
+2025-01-18 12:13:26,746 - INFO - Verifica struttura tabella 'users':
+2025-01-18 12:13:26,746 - INFO - Colonna: id, Tipo: INTEGER, NotNull: 0
+2025-01-18 12:13:26,746 - INFO - Colonna: username, Tipo: TEXT, NotNull: 1
+2025-01-18 12:13:26,746 - INFO - Colonna: password, Tipo: TEXT, NotNull: 1
+2025-01-18 12:13:26,746 - INFO - Colonna: email, Tipo: TEXT, NotNull: 1
+2025-01-18 12:13:26,746 - INFO - Colonna: first_name, Tipo: TEXT, NotNull: 1
+2025-01-18 12:13:26,746 - INFO - Colonna: last_name, Tipo: TEXT, NotNull: 1
+2025-01-18 12:13:26,746 - INFO - Colonna: role, Tipo: TEXT, NotNull: 1
+2025-01-18 12:13:26,746 - INFO - Colonna: is_active, Tipo: INTEGER, NotNull: 1
+2025-01-18 12:13:26,746 - INFO - Colonna: created_at, Tipo: TIMESTAMP, NotNull: 0
+2025-01-18 12:13:26,746 - INFO - Colonna: last_login, Tipo: TIMESTAMP, NotNull: 0
+2025-01-18 12:13:26,746 - INFO - Colonna: reset_token, Tipo: TEXT, NotNull: 0
+2025-01-18 12:13:26,746 - INFO - Colonna: reset_token_expiry, Tipo: TIMESTAMP, NotNull: 0
+2025-01-18 12:13:26,746 - INFO - Verifica utenti nel database:
+2025-01-18 12:13:26,746 - INFO - ----------------------------------------
+2025-01-18 12:13:26,746 - INFO - Username: admin
+2025-01-18 12:13:26,746 - INFO - Email: gueaserge@gmail.com
+2025-01-18 12:13:26,746 - INFO - Ruolo: admin
+2025-01-18 12:13:26,746 - INFO - Nome: Admin
+2025-01-18 12:13:26,746 - INFO - Cognome: User
+2025-01-18 12:13:26,746 - INFO - Inizializzazione sistema completata
+2025-01-18 12:19:30,301 - INFO - Directory base del progetto: /Users/sergeguea/PycharmProjects
+2025-01-18 12:19:30,301 - INFO - Directory data: /Users/sergeguea/PycharmProjects/data
+2025-01-18 12:19:30,301 - INFO - File database: /Users/sergeguea/PycharmProjects/data/users.db
+2025-01-18 12:19:30,603 - INFO - === Avvio Applicazione ===
+2025-01-18 12:19:30,603 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-18 12:19:30,603 - INFO - Sistema operativo: posix
+2025-01-18 12:19:30,603 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-18 12:19:30,603 - INFO - Directory base: /Users/sergeguea/PycharmProjects/AnalysprojectSG
+2025-01-18 12:19:30,603 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data
+2025-01-18 12:19:30,603 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data/users.db
+2025-01-18 12:19:30,603 - INFO - Database non trovato. Inizializzazione...
+2025-01-18 12:19:30,603 - INFO - Inizializzazione del database...
+2025-01-18 12:19:30,604 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-18 12:19:30,607 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-18 12:19:30,607 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-18 12:19:30,607 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-18 12:19:30,608 - INFO - Utente admin creato (se non già presente).
+2025-01-18 12:19:30,608 - INFO - Database inizializzato con successo!
+2025-01-18 12:19:30,608 - INFO - Avvio test del database...
+2025-01-18 12:19:30,608 - INFO - Verifica struttura tabella 'users':
+2025-01-18 12:19:30,608 - INFO - Colonna: id, Tipo: INTEGER, NotNull: 0
+2025-01-18 12:19:30,608 - INFO - Colonna: username, Tipo: TEXT, NotNull: 1
+2025-01-18 12:19:30,608 - INFO - Colonna: password, Tipo: TEXT, NotNull: 1
+2025-01-18 12:19:30,608 - INFO - Colonna: email, Tipo: TEXT, NotNull: 1
+2025-01-18 12:19:30,608 - INFO - Colonna: first_name, Tipo: TEXT, NotNull: 1
+2025-01-18 12:19:30,608 - INFO - Colonna: last_name, Tipo: TEXT, NotNull: 1
+2025-01-18 12:19:30,608 - INFO - Colonna: role, Tipo: TEXT, NotNull: 1
+2025-01-18 12:19:30,608 - INFO - Colonna: is_active, Tipo: INTEGER, NotNull: 1
+2025-01-18 12:19:30,608 - INFO - Colonna: created_at, Tipo: TIMESTAMP, NotNull: 0
+2025-01-18 12:19:30,608 - INFO - Colonna: last_login, Tipo: TIMESTAMP, NotNull: 0
+2025-01-18 12:19:30,608 - INFO - Colonna: reset_token, Tipo: TEXT, NotNull: 0
+2025-01-18 12:19:30,608 - INFO - Colonna: reset_token_expiry, Tipo: TIMESTAMP, NotNull: 0
+2025-01-18 12:19:30,608 - INFO - Verifica utenti nel database:
+2025-01-18 12:19:30,608 - INFO - ----------------------------------------
+2025-01-18 12:19:30,608 - INFO - Username: admin
+2025-01-18 12:19:30,608 - INFO - Email: gueaserge@gmail.com
+2025-01-18 12:19:30,608 - INFO - Ruolo: admin
+2025-01-18 12:19:30,608 - INFO - Nome: Admin
+2025-01-18 12:19:30,609 - INFO - Cognome: User
+2025-01-18 12:19:30,609 - INFO - Inizializzazione sistema completata
+2025-01-18 12:31:39,060 - INFO - Directory base del progetto: /Users/sergeguea/PycharmProjects
+2025-01-18 12:31:39,060 - INFO - Directory data: /Users/sergeguea/PycharmProjects/data
+2025-01-18 12:31:39,060 - INFO - File database: /Users/sergeguea/PycharmProjects/data/users.db
+2025-01-18 12:31:39,060 - INFO - Inizializzazione del database...
+2025-01-18 12:31:39,061 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-18 12:31:39,064 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-18 12:31:39,064 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-18 12:31:39,065 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-18 12:31:39,065 - INFO - Utente admin creato (se non già presente).
+2025-01-18 12:31:39,065 - INFO - Database inizializzato con successo!

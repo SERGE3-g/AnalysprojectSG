@@ -3,7 +3,15 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import sqlite3
 import hashlib
+from pathlib import Path
+import os
 
+# Calcolo percorso DB in base alla directory di questo file .py
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "data"
+DATA_DIR.mkdir(exist_ok=True)  # crea la cartella data se non c'è
+
+DB_FILE = DATA_DIR / "users.db"
 
 class UserManagementWindow:
     def __init__(self, parent):
@@ -38,24 +46,26 @@ class UserManagementWindow:
         self.password_var = tk.StringVar()
         ttk.Entry(grid_frame, textvariable=self.password_var, show="●").grid(row=0, column=3, padx=5, pady=5)
 
-        # Role
+        # Ruolo
         ttk.Label(grid_frame, text="Ruolo:").grid(row=0, column=4, padx=5, pady=5)
         self.role_var = tk.StringVar(value="user")
-        role_combo = ttk.Combobox(grid_frame, textvariable=self.role_var, values=["user", "admin"])
+        role_combo = ttk.Combobox(grid_frame, textvariable=self.role_var, values=["user", "admin"], state='readonly')
         role_combo.grid(row=0, column=5, padx=5, pady=5)
-        role_combo.state(['readonly'])
 
         # Email
         ttk.Label(grid_frame, text="Email:").grid(row=1, column=0, padx=5, pady=5)
         self.email_var = tk.StringVar()
-        ttk.Entry(grid_frame, textvariable=self.email_var).grid(row=1, column=1, columnspan=2, sticky='ew', padx=5,
-                                                                pady=5)
+        ttk.Entry(grid_frame, textvariable=self.email_var).grid(row=1, column=1, columnspan=2, sticky='ew', padx=5, pady=5)
 
-        # Nome completo
-        ttk.Label(grid_frame, text="Nome Completo:").grid(row=1, column=3, padx=5, pady=5)
-        self.fullname_var = tk.StringVar()
-        ttk.Entry(grid_frame, textvariable=self.fullname_var).grid(row=1, column=4, columnspan=2, sticky='ew', padx=5,
-                                                                   pady=5)
+        # Nome
+        ttk.Label(grid_frame, text="Nome:").grid(row=1, column=3, padx=5, pady=5)
+        self.first_name_var = tk.StringVar()
+        ttk.Entry(grid_frame, textvariable=self.first_name_var).grid(row=1, column=4, sticky='ew', padx=5, pady=5)
+
+        # Cognome
+        ttk.Label(grid_frame, text="Cognome:").grid(row=1, column=5, padx=5, pady=5)
+        self.last_name_var = tk.StringVar()
+        ttk.Entry(grid_frame, textvariable=self.last_name_var).grid(row=1, column=6, sticky='ew', padx=5, pady=5)
 
         # Bottone crea
         ttk.Button(create_frame, text="Crea Utente", command=self.create_user).pack(pady=10)
@@ -64,14 +74,21 @@ class UserManagementWindow:
         list_frame = ttk.LabelFrame(main_frame, text="Lista Utenti", padding=10)
         list_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        # Treeview
-        columns = ('ID', 'Username', 'Role', 'Email', 'Full Name', 'Created', 'Last Login', 'Status')
+        # Definizione colonne
+        columns = (
+            'ID', 'Username', 'Ruolo',
+            'Email', 'Nome', 'Cognome',
+            'Created', 'Last Login', 'Status'
+        )
         self.tree = ttk.Treeview(list_frame, columns=columns, show='headings')
 
-        # Configurazione colonne
+        # Impostazione intestazione e larghezza colonne
         for col in columns:
             self.tree.heading(col, text=col)
-            self.tree.column(col, width=100)
+            if col == 'Ruolo':
+                self.tree.column(col, width=120, stretch=True)
+            else:
+                self.tree.column(col, width=100, stretch=True)
 
         self.tree.pack(fill=tk.BOTH, expand=True)
 
@@ -95,20 +112,21 @@ class UserManagementWindow:
         password = self.password_var.get().strip()
         role = self.role_var.get()
         email = self.email_var.get().strip()
-        fullname = self.fullname_var.get().strip()
+        first_name = self.first_name_var.get().strip()
+        last_name = self.last_name_var.get().strip()
 
-        if not all([username, password, role]):
-            messagebox.showerror("Errore", "Username, password e ruolo sono obbligatori")
+        if not all([username, password, role, email, first_name, last_name]):
+            messagebox.showerror("Errore", "Compila tutti i campi obbligatori (username, password, email, nome, cognome).")
             return
 
         try:
-            conn = sqlite3.connect('data/users.db')
+            conn = sqlite3.connect(str(DB_FILE))  # Usa il percorso assoluto
             cursor = conn.cursor()
 
             # Verifica se l'username esiste già
             cursor.execute("SELECT username FROM users WHERE username = ?", (username,))
             if cursor.fetchone():
-                messagebox.showerror("Errore", "Username già esistente")
+                messagebox.showerror("Errore", f"Username '{username}' già esistente.")
                 return
 
             # Hash della password
@@ -116,14 +134,16 @@ class UserManagementWindow:
 
             # Inserimento nuovo utente
             cursor.execute('''
-                INSERT INTO users (username, password, role, email, full_name)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (username, hashed_password, role, email, fullname))
+                INSERT INTO users (
+                    username, password, role, email,
+                    first_name, last_name
+                ) VALUES (?, ?, ?, ?, ?, ?)
+            ''', (username, hashed_password, role, email, first_name, last_name))
 
             conn.commit()
             conn.close()
 
-            messagebox.showinfo("Successo", "Utente creato con successo")
+            messagebox.showinfo("Successo", f"Utente '{username}' creato con successo.")
             self.clear_form()
             self.load_users()
 
@@ -132,26 +152,33 @@ class UserManagementWindow:
 
     def load_users(self):
         try:
-            # Pulisci lista esistente
+            # Pulisci la lista esistente
             for item in self.tree.get_children():
                 self.tree.delete(item)
 
-            conn = sqlite3.connect('data/users.db')
+            conn = sqlite3.connect(str(DB_FILE))
             cursor = conn.cursor()
 
             cursor.execute('''
-                SELECT id, username, role, email, full_name, created_at, last_login, is_active 
-                FROM users ORDER BY created_at DESC
+                SELECT
+                    id, username, role, email,
+                    first_name, last_name,
+                    created_at, last_login, is_active
+                FROM users
+                ORDER BY created_at DESC
             ''')
 
             for row in cursor.fetchall():
-                # Formatta i valori nulli e le date
-                formatted_row = list(row)
-                formatted_row[5] = formatted_row[5][:19] if formatted_row[5] else "Mai"  # created_at
-                formatted_row[6] = formatted_row[6][:19] if formatted_row[6] else "Mai"  # last_login
-                formatted_row[7] = "Attivo" if formatted_row[7] else "Disattivato"
+                row = list(row)  # convert tuple in list
 
-                self.tree.insert("", tk.END, values=formatted_row)
+                # Format date/time
+                row[6] = row[6][:19] if row[6] else "Mai"  # created_at
+                row[7] = row[7][:19] if row[7] else "Mai"  # last_login
+
+                # is_active -> "Attivo"/"Disattivato"
+                row[8] = "Attivo" if row[8] == 1 else "Disattivato"
+
+                self.tree.insert("", tk.END, values=row)
 
             conn.close()
 
@@ -165,7 +192,7 @@ class UserManagementWindow:
             return
 
         user = self.tree.item(selected[0])['values']
-        username = user[1]  # username è nella seconda colonna
+        username = user[1]
 
         if username == 'admin':
             messagebox.showerror("Errore", "Non puoi eliminare l'utente admin")
@@ -173,13 +200,13 @@ class UserManagementWindow:
 
         if messagebox.askyesno("Conferma", f"Vuoi davvero eliminare l'utente {username}?"):
             try:
-                conn = sqlite3.connect('data/users.db')
+                conn = sqlite3.connect(str(DB_FILE))
                 cursor = conn.cursor()
                 cursor.execute("DELETE FROM users WHERE username = ?", (username,))
                 conn.commit()
                 conn.close()
 
-                messagebox.showinfo("Successo", "Utente eliminato con successo")
+                messagebox.showinfo("Successo", f"Utente '{username}' eliminato.")
                 self.load_users()
 
             except sqlite3.Error as e:
@@ -194,7 +221,6 @@ class UserManagementWindow:
         user = self.tree.item(selected[0])['values']
         username = user[1]
 
-        # Crea dialog per nuova password
         dialog = tk.Toplevel(self.window)
         dialog.title("Cambia Password")
         dialog.geometry("300x150")
@@ -212,12 +238,11 @@ class UserManagementWindow:
                 return
 
             try:
-                conn = sqlite3.connect('data/users.db')
+                conn = sqlite3.connect(str(DB_FILE))
                 cursor = conn.cursor()
 
                 hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
-                cursor.execute("UPDATE users SET password = ? WHERE username = ?",
-                               (hashed_password, username))
+                cursor.execute("UPDATE users SET password = ? WHERE username = ?", (hashed_password, username))
 
                 conn.commit()
                 conn.close()
@@ -238,7 +263,7 @@ class UserManagementWindow:
 
         user = self.tree.item(selected[0])['values']
         username = user[1]
-        current_status = user[7]  # Status è nell'ultima colonna
+        current_status = user[8]
 
         if username == 'admin':
             messagebox.showerror("Errore", "Non puoi disattivare l'utente admin")
@@ -247,10 +272,9 @@ class UserManagementWindow:
         new_status = 0 if current_status == "Attivo" else 1
 
         try:
-            conn = sqlite3.connect('data/users.db')
+            conn = sqlite3.connect(str(DB_FILE))
             cursor = conn.cursor()
-            cursor.execute("UPDATE users SET is_active = ? WHERE username = ?",
-                           (new_status, username))
+            cursor.execute("UPDATE users SET is_active = ? WHERE username = ?", (new_status, username))
             conn.commit()
             conn.close()
 
@@ -261,17 +285,16 @@ class UserManagementWindow:
             messagebox.showerror("Errore Database", str(e))
 
     def clear_form(self):
-        """Pulisce il form di creazione utente"""
         self.username_var.set("")
         self.password_var.set("")
         self.role_var.set("user")
         self.email_var.set("")
-        self.fullname_var.set("")
+        self.first_name_var.set("")
+        self.last_name_var.set("")
 
 
-# Test standalone
 if __name__ == "__main__":
     root = tk.Tk()
-    root.withdraw()  # Nascondi la finestra principale
+    root.withdraw()
     app = UserManagementWindow(root)
     root.mainloop()

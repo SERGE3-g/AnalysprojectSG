@@ -1,4 +1,5 @@
 import tkinter as tk
+import traceback
 from tkinter import ttk, filedialog, messagebox
 import threading
 from datetime import datetime
@@ -13,10 +14,11 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
-class FileTab:
-    def __init__(self, notebook):
-        self.frame = ttk.Frame(notebook)
-        notebook.add(self.frame, text='Analisi Check SDD')
+class FileTab(ttk.Frame):
+    def __init__(self, parent, current_user, user_role):
+        super().__init__(parent)
+        self.current_user = current_user
+        self.user_role = user_role
 
         # Variabili
         self.selected_files = []
@@ -29,7 +31,7 @@ class FileTab:
         # Creazione interfaccia
         self.create_gui()
 
-        # Avvio processamento code
+        # Avvio processamento code (ascolta costantemente le code)
         self.process_queues()
 
     def setup_style(self):
@@ -44,8 +46,8 @@ class FileTab:
 
     def create_gui(self):
         """Crea l'interfaccia grafica"""
-        # Frame principale con divisione verticale
-        main_frame = ttk.PanedWindow(self.frame, orient=tk.HORIZONTAL)
+        # Frame principale con divisione orizzontale
+        main_frame = ttk.PanedWindow(self, orient=tk.HORIZONTAL)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Pannello sinistro (controlli)
@@ -134,13 +136,11 @@ class FileTab:
         """Crea il pannello destro con i risultati"""
         panel = ttk.Frame(parent)
 
-        # Progress bar - Inizializzazione corretta
+        # Progress bar
         progress_frame = ttk.Frame(panel)
         progress_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        # Inizializza progress_var
-        self.progress_var = tk.DoubleVar()  # Aggiungi questa linea
-
+        self.progress_var = tk.DoubleVar()
         self.progress_label = ttk.Label(progress_frame, text="")
         self.progress_label.pack()
 
@@ -148,7 +148,7 @@ class FileTab:
             progress_frame,
             orient=tk.HORIZONTAL,
             mode='determinate',
-            variable=self.progress_var  # Usa la variabile inizializzata
+            variable=self.progress_var
         )
         self.progress_bar.pack(fill=tk.X)
 
@@ -166,13 +166,6 @@ class FileTab:
         self.create_log_tab()
 
         return panel
-
-    def update_progress(self, current, total):
-        """Aggiorna la barra di progresso"""
-        progress = (current / total) * 100
-        self.progress_var.set(progress)  # Ora questa linea funzionerà
-        self.progress_label.config(text=f"Analizzato {current} di {total} file")
-        self.frame.update_idletasks()
 
     def create_results_tab(self):
         """Crea il tab dei risultati"""
@@ -200,14 +193,12 @@ class FileTab:
             'File', 'NbOfTxs', 'TtlIntrBkSttlmAmt',
             'Data Analisi', 'Stato'
         )
-
         self.results_tree = ttk.Treeview(
             results_frame,
             columns=columns,
             show='headings'
         )
 
-        # Configurazione colonne
         for col in columns:
             self.results_tree.heading(col, text=col)
             self.results_tree.column(col, width=120)
@@ -218,10 +209,8 @@ class FileTab:
             orient=tk.VERTICAL,
             command=self.results_tree.yview
         )
-
         self.results_tree.configure(yscrollcommand=scrollbar.set)
 
-        # Layout
         self.results_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
@@ -261,15 +250,12 @@ class FileTab:
         log_frame = ttk.Frame(self.results_notebook)
         self.results_notebook.add(log_frame, text="Log")
 
-        # Area log
         self.log_text = tk.Text(log_frame, wrap=tk.WORD)
-
         scrollbar = ttk.Scrollbar(
             log_frame,
             orient=tk.VERTICAL,
             command=self.log_text.yview
         )
-
         self.log_text.configure(yscrollcommand=scrollbar.set)
 
         self.log_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -281,7 +267,7 @@ class FileTab:
         self.log_text.tag_configure("SUCCESS", foreground="green")
 
     def process_queues(self):
-        """Processa le code dei risultati e dei log"""
+        """Processa le code dei risultati e dei log, periodicamente."""
         # Processa coda risultati
         try:
             while True:
@@ -301,8 +287,8 @@ class FileTab:
         except Queue.Empty:
             pass
 
-        # Rischedula
-        self.frame.after(100, self.process_queues)
+        # Rischedula questo metodo
+        self.after(100, self.process_queues)
 
     def browse_files(self):
         """Gestisce la selezione dei file"""
@@ -321,7 +307,7 @@ class FileTab:
             self.log_queue.put(("INFO", f"Selezionati {len(files)} file"))
 
     def start_analysis(self):
-        """Avvia l'analisi dei file"""
+        """Avvia l'analisi dei file in un thread separato"""
         if not self.selected_files:
             messagebox.showwarning("Attenzione", "Seleziona almeno un file!")
             return
@@ -330,12 +316,12 @@ class FileTab:
         self.start_button.config(state=tk.DISABLED)
 
         # Pulisci le visualizzazioni precedenti
-        self.results_tree.delete(*self.results_tree.get_children())  # Pulisci tabella
-        self.progress_bar['value'] = 0  # Resetta progress bar
-        self.progress_label.config(text="")  # Pulisci label
-        self.figure.clear()  # Pulisci grafico
+        self.results_tree.delete(*self.results_tree.get_children())
+        self.progress_bar['value'] = 0
+        self.progress_label.config(text="")
+        self.figure.clear()
         self.canvas.draw()
-        self.log_text.delete(1.0, tk.END)  # Pulisci log
+        self.log_text.delete(1.0, tk.END)
 
         # Nome file output
         now = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -349,7 +335,7 @@ class FileTab:
         ).start()
 
     def process_files(self, files, output_excel):
-        """Elabora i file selezionati"""
+        """Elabora i file selezionati (logica in un thread separato)"""
         try:
             self.log_queue.put(("INFO", "Avvio analisi..."))
             data = []
@@ -357,10 +343,10 @@ class FileTab:
             errors = []
 
             for i, file_path in enumerate(files, 1):
-                try:
-                    # Aggiorna progresso usando after
-                    self.frame.after(0, self.update_progress, i, total_files)
+                # Aggiorna barra progresso
+                self.after(0, self.update_progress, i, total_files)
 
+                try:
                     # Analizza file
                     results = self.parse_file(file_path)
                     results = self.apply_filters(results)
@@ -373,65 +359,64 @@ class FileTab:
                             'status': 'OK'
                         }
                         data.append(file_data)
-                        # Aggiorna UI usando after
-                        self.frame.after(0, lambda d=file_data: self.result_queue.put(("update_tree", d)))
+                        # Aggiorna la tabella
+                        self.after(0, lambda d=file_data:
+                                   self.result_queue.put(("update_tree", d)))
 
                 except Exception as e:
                     errors.append((file_path, str(e)))
-                    self.frame.after(0, lambda msg=f"Errore nell'analisi di {file_path}: {str(e)}":
-                    self.log_queue.put(("ERROR", msg)))
+                    self.after(0, lambda msg=f"Errore nell'analisi di {file_path}: {str(e)}:" + "\n\n" + traceback.format_exc():
+                                             self.log_queue.put(("ERROR", msg)))
 
             if data:
                 # Crea report Excel
                 self.create_excel_report(data, output_excel)
-                # Aggiorna grafico usando after
-                self.frame.after(0, lambda d=data: self.result_queue.put(("update_chart", d)))
-                self.frame.after(0, lambda: self.log_queue.put(
+                # Aggiorna grafico
+                self.after(0, lambda d=data: self.result_queue.put(("update_chart", d)))
+                self.after(0, lambda: self.log_queue.put(
                     ("SUCCESS", f"Analisi completata. File salvato: {output_excel}")))
-                self.frame.after(0, lambda: messagebox.showinfo(
+                self.after(0, lambda: messagebox.showinfo(
                     "Successo", f"Analisi completata. File salvato: {output_excel}"))
             else:
-                self.frame.after(0, lambda: messagebox.showwarning(
+                self.after(0, lambda: messagebox.showwarning(
                     "Attenzione", "Nessun dato trovato nei file analizzati"))
 
             if errors:
-                self.frame.after(0, lambda: self.show_errors_dialog(errors))
+                self.after(0, lambda: self.show_errors_dialog(errors))
 
         except Exception as e:
-            self.frame.after(0, lambda: messagebox.showerror("Errore", str(e)))
-
+            self.after(0, lambda: messagebox.showerror("Errore", str(e)))
         finally:
-            self.frame.after(0, lambda: self.start_button.config(state=tk.NORMAL))
+            self.after(0, lambda: self.start_button.config(state=tk.NORMAL))
 
     def parse_file(self, file_path):
-        """Analizza il file per estrarre i valori"""
+        """Analizza il file per estrarre i valori desiderati"""
         try:
             with open(file_path, 'r', encoding='utf-8') as file:
                 content = file.read()
 
-                # Cerca i valori con regex
-                txs_matches = re.findall(r'<NbOfTxs>(\d+)</NbOfTxs>', content)
-                amt_matches = re.findall(r'<TtlIntrBkSttlmAmt[^>]*>([0-9.]+)</TtlIntrBkSttlmAmt>', content)
+            # Regex di esempio
+            txs_matches = re.findall(r'<NbOfTxs>(\d+)</NbOfTxs>', content)
+            amt_matches = re.findall(r'<TtlIntrBkSttlmAmt[^>]*>([0-9.]+)</TtlIntrBkSttlmAmt>', content)
 
-                results = []
-                for txs, amt in zip(txs_matches, amt_matches):
-                    results.append({
-                        'NbOfTxs': int(txs),
-                        'TtlIntrBkSttlmAmt': float(amt)
-                    })
-
-                return results
+            results = []
+            for txs, amt in zip(txs_matches, amt_matches):
+                results.append({
+                    'NbOfTxs': int(txs),
+                    'TtlIntrBkSttlmAmt': float(amt)
+                })
+            return results
 
         except Exception as e:
             self.log_queue.put(("ERROR", f"Errore nel parsing del file {file_path}: {str(e)}"))
             raise
 
     def apply_filters(self, results):
-        """Applica i filtri ai risultati"""
+        """Applica eventuali filtri ai risultati (importo minimo/massimo)"""
         if not results:
             return results
 
-        filtered = results.copy()
+        filtered = list(results)  # copia
 
         try:
             # Filtro importo minimo
@@ -444,9 +429,9 @@ class FileTab:
                 max_val = float(self.max_amount.get())
                 filtered = [r for r in filtered if r['TtlIntrBkSttlmAmt'] <= max_val]
 
-        except ValueError as e:
+        except ValueError:
             self.log_queue.put(("ERROR", "Errore nei filtri: i valori devono essere numerici"))
-            raise ValueError("I valori dei filtri devono essere numerici") from e
+            raise ValueError("I valori dei filtri devono essere numerici")
 
         return filtered
 
@@ -465,23 +450,21 @@ class FileTab:
                         'Stato': file_data['status']
                     })
 
-            # Crea DataFrame
             df = pd.DataFrame(rows)
 
             # Aggiungi riga totali
-            totals = pd.DataFrame([{
-                'File': 'TOTALE',
-                'NbOfTxs': df['NbOfTxs'].sum(),
-                'TtlIntrBkSttlmAmt': df['TtlIntrBkSttlmAmt'].sum(),
-                'Data Analisi': '',
-                'Stato': ''
-            }])
-
-            df = pd.concat([df, totals])
+            if not df.empty:
+                totals = pd.DataFrame([{
+                    'File': 'TOTALE',
+                    'NbOfTxs': df['NbOfTxs'].sum(),
+                    'TtlIntrBkSttlmAmt': df['TtlIntrBkSttlmAmt'].sum(),
+                    'Data Analisi': '',
+                    'Stato': ''
+                }])
+                df = pd.concat([df, totals], ignore_index=True)
 
             # Salva Excel
             df.to_excel(output_file, index=False)
-
             # Applica stili
             self.apply_excel_styles(output_file)
 
@@ -490,7 +473,7 @@ class FileTab:
             raise
 
     def apply_excel_styles(self, file_path):
-        """Applica stili al file Excel"""
+        """Applica stili al file Excel con openpyxl"""
         wb = load_workbook(file_path)
         ws = wb.active
 
@@ -500,25 +483,23 @@ class FileTab:
         bold_font = Font(bold=True)
         center_align = Alignment(horizontal="center")
 
-        # Applica stili all'intestazione
+        # Intestazione
         for cell in ws[1]:
             cell.fill = header_fill
             cell.font = bold_font
             cell.alignment = center_align
 
-        # Aggiorna larghezza colonne
+        # Larghezza colonne
         for column in ws.columns:
             max_length = 0
             column_letter = column[0].column_letter
             for cell in column:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
-                except:
-                    pass
+                value_len = len(str(cell.value)) if cell.value else 0
+                if value_len > max_length:
+                    max_length = value_len
             ws.column_dimensions[column_letter].width = max_length + 2
 
-        # Applica stili alla riga totale
+        # Riga totale (ultima riga)
         for cell in ws[ws.max_row]:
             cell.fill = total_fill
             cell.font = bold_font
@@ -538,7 +519,7 @@ class FileTab:
             ))
 
     def update_chart(self, data=None):
-        """Aggiorna il grafico"""
+        """Aggiorna il grafico in base ai dati"""
         self.figure.clear()
         ax = self.figure.add_subplot(111)
 
@@ -546,19 +527,18 @@ class FileTab:
             data = self._collect_tree_data()
 
         if not data:
+            self.canvas.draw()
             return
 
         # Prepara i dati per il grafico
         files = []
-        txs = []
         amounts = []
+
         for file_data in data:
             for result in file_data['results']:
                 files.append(file_data['file'])
-                txs.append(result['NbOfTxs'])
                 amounts.append(result['TtlIntrBkSttlmAmt'])
 
-        # Crea il grafico appropriato
         if self.chart_type.get() == "bar":
             ax.bar(range(len(files)), amounts)
         else:  # line
@@ -573,19 +553,30 @@ class FileTab:
         self.canvas.draw()
 
     def _collect_tree_data(self):
-        """Raccoglie i dati dalla tabella per il grafico"""
+        """Raccoglie i dati dalla tabella per il grafico (lettura diretta dalla Treeview)"""
         data = []
         for item in self.results_tree.get_children():
             values = self.results_tree.item(item)['values']
-            data.append({
-                'file': values[0],
-                'results': [{
-                    'NbOfTxs': values[1],
-                    'TtlIntrBkSttlmAmt': values[2]
-                }],
-                'timestamp': datetime.strptime(values[3], '%Y-%m-%d %H:%M:%S'),
-                'status': values[4]
-            })
+            if len(values) < 5:
+                continue
+            try:
+                # Converte i valori
+                nb_of_txs = int(values[1])
+                amount = float(values[2])
+                dt = datetime.strptime(values[3], '%Y-%m-%d %H:%M:%S')
+                status = values[4]
+
+                data.append({
+                    'file': values[0],
+                    'results': [{
+                        'NbOfTxs': nb_of_txs,
+                        'TtlIntrBkSttlmAmt': amount
+                    }],
+                    'timestamp': dt,
+                    'status': status
+                })
+            except (ValueError, TypeError):
+                continue
         return data
 
     def update_progress(self, current, total):
@@ -593,7 +584,7 @@ class FileTab:
         progress = (current / total) * 100
         self.progress_var.set(progress)
         self.progress_label.config(text=f"Analizzato {current} di {total} file")
-        self.frame.update_idletasks()
+        self.update_idletasks()
 
     def add_log(self, level, message):
         """Aggiunge un messaggio al log"""
@@ -608,40 +599,50 @@ class FileTab:
             messagebox.showinfo("Info", "Nessun dato disponibile per le statistiche")
             return
 
-        stats_window = tk.Toplevel(self.frame)
+        stats_window = tk.Toplevel(self)
         stats_window.title("Statistiche")
         stats_window.geometry("400x300")
 
-        # Calcola statistiche
-        all_amounts = [r['TtlIntrBkSttlmAmt'] for d in data for r in d['results']]
-        all_txs = [r['NbOfTxs'] for d in data for r in d['results']]
+        try:
+            # Estrai e converti i valori
+            all_amounts = [float(r['TtlIntrBkSttlmAmt']) for d in data for r in d['results']]
+            all_txs = [int(r['NbOfTxs']) for d in data for r in d['results']]
 
-        stats_text = f"""
-        Statistiche Analisi:
+            if not all_amounts or not all_txs:
+                messagebox.showwarning("Attenzione", "Nessun dato valido per le statistiche")
+                stats_window.destroy()
+                return
 
-        Numero file analizzati: {len(data)}
+            stats_text = f"""
+            Statistiche Analisi:
 
-        Importi:
-        - Totale: {sum(all_amounts):.2f}
-        - Media: {sum(all_amounts) / len(all_amounts):.2f}
-        - Minimo: {min(all_amounts):.2f}
-        - Massimo: {max(all_amounts):.2f}
+            Numero file analizzati: {len(data)}
 
-        Transazioni:
-        - Totale: {sum(all_txs)}
-        - Media: {sum(all_txs) / len(all_txs):.2f}
-        - Minimo: {min(all_txs)}
-        - Massimo: {max(all_txs)}
-        """
+            Importi:
+            - Totale: {sum(all_amounts):,.2f}
+            - Media: {sum(all_amounts) / len(all_amounts):,.2f}
+            - Minimo: {min(all_amounts):,.2f}
+            - Massimo: {max(all_amounts):,.2f}
 
-        text = tk.Text(stats_window, wrap=tk.WORD, padx=10, pady=10)
-        text.pack(fill=tk.BOTH, expand=True)
-        text.insert('1.0', stats_text)
-        text.config(state='disabled')
+            Transazioni:
+            - Totale: {sum(all_txs):,d}
+            - Media: {sum(all_txs) / len(all_txs):,.2f}
+            - Minimo: {min(all_txs):,d}
+            - Massimo: {max(all_txs):,d}
+            """
+
+            text = tk.Text(stats_window, wrap=tk.WORD, padx=10, pady=10)
+            text.pack(fill=tk.BOTH, expand=True)
+            text.insert('1.0', stats_text)
+            text.config(state='disabled')
+
+        except Exception as e:
+            messagebox.showerror("Errore", f"Errore nel calcolo delle statistiche: {str(e)}")
+            stats_window.destroy()
 
     def show_errors_dialog(self, errors):
         """Mostra una finestra con gli errori riscontrati"""
-        dialog = tk.Toplevel(self.frame)
+        dialog = tk.Toplevel(self)
         dialog.title("Errori Riscontrati")
         dialog.geometry("500x300")
 
@@ -666,6 +667,30 @@ class FileTab:
         self.selected_files = []
         self.log_queue.put(("INFO", "Interfaccia resettata"))
 
+    def reset_results(self):
+        """Resetta solo i risultati e le visualizzazioni, senza toccare i campi input"""
+        self.results_tree.delete(*self.results_tree.get_children())
+        self.progress_bar['value'] = 0
+        self.progress_label.config(text="")
+        self.figure.clear()
+        self.canvas.draw()
+        self.log_text.delete(1.0, tk.END)
+
+        # Svuota eventuali code di messaggi
+        while not self.result_queue.empty():
+            try:
+                self.result_queue.get_nowait()
+            except Queue.Empty:
+                pass
+
+        while not self.log_queue.empty():
+            try:
+                self.log_queue.get_nowait()
+            except Queue.Empty:
+                pass
+
+        self.log_queue.put(("INFO", "Risultati resettati"))
+
     def export_excel(self):
         """Esporta i dati correnti in Excel"""
         data = self._collect_tree_data()
@@ -678,7 +703,6 @@ class FileTab:
             filetypes=[("Excel files", "*.xlsx")],
             initialfile=f"analisi_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
         )
-
         if file_path:
             try:
                 self.create_excel_report(data, file_path)
@@ -686,102 +710,19 @@ class FileTab:
             except Exception as e:
                 messagebox.showerror("Errore", f"Errore nell'esportazione: {str(e)}")
 
+    def search(self, text):
+        """Ricerca semplice nel tab (usata da una ricerca globale)"""
+        results = []
+        # Cerca nel log
+        log_content = self.log_text.get(1.0, tk.END)
+        if text.lower() in log_content.lower():
+            results.append(("Log FileTab", log_content.strip()))
 
-def _collect_tree_data(self):
-    """Raccoglie i dati dalla tabella per il grafico"""
-    data = []
-    for item in self.results_tree.get_children():
-        values = self.results_tree.item(item)['values']
-        try:
-            data.append({
-                'file': values[0],
-                'results': [{
-                    'NbOfTxs': int(values[1]),  # Converti in intero
-                    'TtlIntrBkSttlmAmt': float(values[2])  # Converti in float
-                }],
-                'timestamp': datetime.strptime(values[3], '%Y-%m-%d %H:%M:%S'),
-                'status': values[4]
-            })
-        except (ValueError, TypeError):
-            continue  # Salta le righe con valori non validi
-    return data
+        # Se vuoi anche cercare nei risultati, puoi aggiungere:
+        for item in self.results_tree.get_children():
+            row_vals = self.results_tree.item(item)['values']
+            row_str = " ".join(str(v) for v in row_vals)
+            if text.lower() in row_str.lower():
+                results.append(("Risultati FileTab", row_str))
 
-
-def show_statistics(self):
-    """Mostra una finestra con statistiche dettagliate"""
-    data = self._collect_tree_data()
-    if not data:
-        messagebox.showinfo("Info", "Nessun dato disponibile per le statistiche")
-        return
-
-    stats_window = tk.Toplevel(self.frame)
-    stats_window.title("Statistiche")
-    stats_window.geometry("400x300")
-
-    try:
-        # Estrai e converti i valori assicurandoti che siano numeri
-        all_amounts = [float(r['TtlIntrBkSttlmAmt']) for d in data for r in d['results']]
-        all_txs = [int(r['NbOfTxs']) for d in data for r in d['results']]
-
-        if not all_amounts or not all_txs:
-            messagebox.showwarning("Attenzione", "Nessun dato valido per le statistiche")
-            stats_window.destroy()
-            return
-
-        stats_text = f"""
-        Statistiche Analisi:
-
-        Numero file analizzati: {len(data)}
-
-        Importi:
-        - Totale: {sum(all_amounts):,.2f}
-        - Media: {sum(all_amounts) / len(all_amounts):,.2f}
-        - Minimo: {min(all_amounts):,.2f}
-        - Massimo: {max(all_amounts):,.2f}
-
-        Transazioni:
-        - Totale: {sum(all_txs):,d}
-        - Media: {sum(all_txs) / len(all_txs):,.2f}
-        - Minimo: {min(all_txs):,d}
-        - Massimo: {max(all_txs):,d}
-        """
-
-        text = tk.Text(stats_window, wrap=tk.WORD, padx=10, pady=10)
-        text.pack(fill=tk.BOTH, expand=True)
-        text.insert('1.0', stats_text)
-        text.config(state='disabled')
-
-    except Exception as e:
-        messagebox.showerror("Errore", f"Errore nel calcolo delle statistiche: {str(e)}")
-        stats_window.destroy()
-
-def reset_results(self):
-    """Resetta tutti i risultati e le visualizzazioni"""
-    # Pulisci tabella risultati
-    self.results_tree.delete(*self.results_tree.get_children())
-
-    # Resetta progress bar
-    self.progress_bar['value'] = 0
-    self.progress_label.config(text="")
-
-    # Pulisci grafico
-    self.figure.clear()
-    self.canvas.draw()
-
-    # Pulisci log
-    self.log_text.delete(1.0, tk.END)
-
-    # Resetta code
-    while not self.result_queue.empty():
-        try:
-            self.result_queue.get_nowait()
-        except Queue.Empty:
-            break
-
-    while not self.log_queue.empty():
-        try:
-            self.log_queue.get_nowait()
-        except Queue.Empty:
-            break
-
-    self.log_queue.put(("INFO", "Risultati resettati"))
+        return results

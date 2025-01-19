@@ -1,33 +1,45 @@
-import json
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, messagebox
 import os
 import sys
-from datetime import datetime
-import webbrowser
-from dataclasses import dataclass
-from pathlib import Path
 import logging
-from test_analyzer_tab import TestAnalyzerTab
+import webbrowser
+from pathlib import Path
+
+from login_window import LoginWindow
+from init_db import initialize_database
+# Se usi i test tab e altri, importali pure
+from src.test_analyzer_tab import TestAnalyzerTab
+from user_management import UserManagementWindow
+from fiscal_analyzer import FiscalTab
+from file_analyzer import FileTab
+from inventory_manager import InventoryTab
+from sla_analyzer import SLATab
+
+# Imposta i path di progetto se necessario
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, project_root)
 
 # Configurazione logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('multi_tool.log'),
+        logging.FileHandler('application.log'),
         logging.StreamHandler(sys.stdout)
     ]
 )
-
 
 class MainApp:
     VERSION = "1.0"
 
     def __init__(self):
-        """Inizializza l'applicazione principale"""
+        """Inizializza l'applicazione principale."""
         try:
-            # Inizializzazione variabili utente
+            # Inizializza il sistema (database, cartelle, ecc.)
+            self.initialize_system()
+
+            # Variabili utente
             self.current_user = None
             self.user_role = None
             self.user_management_window = None
@@ -41,487 +53,396 @@ class MainApp:
             self.search_var = None
             self.notebook = None
 
-            # Avvia il login
+            # Avvia la finestra di Login
             self.start_login()
 
         except Exception as e:
+            logging.error(f"Errore di inizializzazione: {str(e)}")
             messagebox.showerror("Errore di Inizializzazione",
                                  f"Errore durante l'inizializzazione: {str(e)}")
             sys.exit(1)
 
+    def initialize_system(self):
+        """Inizializza il sistema e verifica il database."""
+        try:
+            BASE_DIR = Path(__file__).resolve().parent.parent
+            DATA_DIR = BASE_DIR / 'data'
+            DB_FILE = DATA_DIR / 'users.db'
+
+            logging.info(f"Directory base: {BASE_DIR}")
+            logging.info(f"Directory data: {DATA_DIR}")
+            logging.info(f"File database: {DB_FILE}")
+
+            DATA_DIR.mkdir(exist_ok=True)  # Crea la dir 'data' se non esiste
+
+            # Se il DB non esiste, inizializza
+            if not DB_FILE.exists():
+                logging.info("Database non trovato. Inizializzazione...")
+                if not initialize_database():
+                    raise Exception("Errore nell'inizializzazione del database")
+
+            logging.info("Inizializzazione sistema completata")
+
+        except Exception as e:
+            logging.error(f"Errore inizializzazione sistema: {str(e)}")
+            raise
+
     def start_login(self):
-        """Avvia il processo di login"""
+        """Avvia il processo di login."""
         try:
             login = LoginWindow(self.on_login_success)
             login.root.mainloop()
         except Exception as e:
+            logging.error(f"Errore durante il login: {str(e)}")
             messagebox.showerror("Errore di Login",
                                  f"Errore durante il login: {str(e)}")
             sys.exit(1)
 
     def on_login_success(self, username, role):
-        """Callback per login riuscito"""
+        """Callback dopo un login riuscito."""
         try:
+            logging.info(f"Login riuscito - Utente: {username}, Ruolo: {role}")
             self.current_user = username
             self.user_role = role
             if hasattr(self, 'root') and self.root is not None:
                 self.root.destroy()
             self.create_main_window()
         except Exception as e:
+            logging.error(f"Errore post-login: {str(e)}")
             messagebox.showerror("Errore Post-Login",
                                  f"Errore dopo il login: {str(e)}")
             sys.exit(1)
 
     def create_main_window(self):
-        """Crea la finestra principale dopo il login"""
+        """Crea la finestra principale dell'applicazione."""
         try:
             self.root = tk.Tk()
-            self.root.title(f"Multi-Tool Analyzer - {self.current_user}")
+            self.root.title(f"Business Intelligence Suite - v{self.VERSION}")
+            self.root.geometry("1024x768")
+            self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-            # Configura finestra principale
-            self.setup_main_window()
+            # Barra dei menu
+            self.create_menu_bar()
 
-            # Inizializza variabili
-            self.status_var = tk.StringVar(value=f"Utente: {self.current_user} ({self.user_role})")
+            # Variabili di stato
+            self.status_var = tk.StringVar(value=f"Benvenuto, {self.current_user} ({self.user_role})")
             self.search_var = tk.StringVar()
-            self.search_var.trace('w', self.global_search)
 
-            # Setup interfaccia
-            self.setup_style()
-            self.create_menu()
-            self.create_toolbar()
-            self.create_gui()
+            # Notebook per i tab
+            self.notebook = ttk.Notebook(self.root)
+            self.notebook.pack(expand=True, fill='both', padx=10, pady=10)
 
-            # Centra la finestra e avvia
-            self.center_window()
-            self.root.protocol("WM_DELETE_WINDOW", self.quit_app)
+            # Crea i vari tab
+            self.create_tabs()
+
+            # Barra di stato in basso
+            status_bar = tk.Label(
+                self.root,
+                textvariable=self.status_var,
+                bd=1,
+                relief=tk.SUNKEN,
+                anchor=tk.W
+            )
+            status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+
             self.root.mainloop()
 
         except Exception as e:
-            messagebox.showerror("Errore Interfaccia",
-                                 f"Errore nella creazione dell'interfaccia: {str(e)}")
+            logging.error(f"Errore creazione finestra principale: {str(e)}")
+            messagebox.showerror("Errore",
+                                 f"Impossibile creare la finestra principale: {str(e)}")
             sys.exit(1)
 
-    def setup_main_window(self):
-        """Configura la finestra principale"""
-        self.root.geometry("1200x800")
-        self.root.minsize(800, 600)
-        self.root.grid_rowconfigure(1, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
-
-    def setup_style(self):
-        """Configura lo stile dell'applicazione"""
-        self.style = ttk.Style()
-        self.style.theme_use('clam')
-
-        # Configura stili personalizzati
-        self.style.configure('Header.TLabel',
-                             font=('Arial', 20, 'bold'),
-                             padding=10)
-        self.style.configure('Status.TLabel',
-                             font=('Arial', 9),
-                             padding=2)
-
-    def create_menu(self):
-        """Crea la barra dei menu"""
-        menubar = tk.Menu(self.root)
-        self.root.config(menu=menubar)
+    def create_menu_bar(self):
+        """Crea la barra dei menu."""
+        menu_bar = tk.Menu(self.root)
+        self.root.config(menu=menu_bar)
 
         # Menu File
-        file_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="File", menu=file_menu)
+        file_menu = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="File", menu=file_menu)
 
-        if self.user_role == 'admin':
-            file_menu.add_command(label="Gestione Utenti",
-                                  command=self.show_user_management)
-            file_menu.add_command(label="Impostazioni",
-                                  command=self.show_settings)
-            file_menu.add_separator()
+        # Gestione utenti (solo admin)
+        file_menu.add_command(
+            label="Gestione Utenti",
+            command=self.open_user_management,
+            state='normal' if self.user_role == 'admin' else 'disabled'
+        )
+        file_menu.add_separator()
 
+        # Logout e uscita
         file_menu.add_command(label="Logout", command=self.logout)
-        file_menu.add_command(label="Esci", command=self.quit_app)
+        file_menu.add_command(label="Esci", command=self.on_closing)
 
-        # Menu Help
-        help_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="Help", menu=help_menu)
-        help_menu.add_command(label="Documentazione", command=self.show_docs)
-        help_menu.add_command(label="Info", command=self.show_about)
+        # Menu View
+        #view_menu = tk.Menu(menu_bar, tearoff=0)
+        #menu_bar.add_cascade(label="View", menu=view_menu)
+        #view_menu.add_command(label="Impostazioni", command=self.open_settings)
 
-        # Menu Supporto
-        support_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="Supporto", menu=support_menu)
-        support_menu.add_command(label="Contattaci", command=self.show_contact)
+        # Menu Strumenti
+        tools_menu = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="Strumenti", menu=tools_menu)
+        tools_menu.add_command(label="Cerca", command=self.open_search)
+        tools_menu.add_command(label="Impostazioni", command=self.open_settings)
+        # etc...
 
-    def create_toolbar(self):
-        """Crea la barra degli strumenti"""
-        toolbar = ttk.Frame(self.root)
-        toolbar.grid(row=0, column=0, sticky='ew', padx=5, pady=2)
+        # Menu Aiuto
+        help_menu = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="Aiuto", menu=help_menu)
+        help_menu.add_command(label="Manuale", command=self.open_manual)
+        help_menu.add_command(label="Informazioni su", command=self.show_about)
 
-        # Ricerca globale
-        ttk.Label(toolbar, text="Cerca:").pack(side='left', padx=2)
-        search_entry = ttk.Entry(toolbar, textvariable=self.search_var)
-        search_entry.pack(side='left', padx=2, expand=True, fill='x')
+    def create_tabs(self):
+        """Crea e aggiunge i tab all'interno del notebook."""
+        try:
+            # Tab Analisi Fiscale
+            self.fiscal_tab = FiscalTab(self.notebook, self.current_user, self.user_role)
+            self.notebook.add(self.fiscal_tab, text="Analisi Fiscale")
 
-    def create_gui(self):
-        """Crea l'interfaccia principale"""
-        # Notebook per le schede
-        self.notebook = ttk.Notebook(self.root)
-        self.notebook.grid(row=1, column=0, sticky='nsew', padx=5, pady=5)
+            # Tab Analisi File
+            self.file_tab = FileTab(self.notebook, self.current_user, self.user_role)
+            self.notebook.add(self.file_tab, text="Analisi Check SDD")
 
-        # Creazione delle schede
-        self.fiscal_tab = FiscalTab(self.notebook)
-        self.file_tab = FileTab(self.notebook)
-        self.inventory_tab = InventoryTab(self.notebook)
-        self.sla_tab = SLATab(self.notebook)
-        self.test_analyzer_tab = TestAnalyzerTab(self.notebook)
+            # Tab Gestione Inventario
+            self.inventory_tab = InventoryTab(self.notebook, self.current_user, self.user_role)
+            self.notebook.add(self.inventory_tab, text="Gestione Inventario")
 
-        # Status bar
-        status_frame = ttk.Frame(self.root)
-        status_frame.grid(row=2, column=0, sticky='ew')
+            # Tab Analisi SLA
+            self.sla_tab = SLATab(self.notebook, self.current_user, self.user_role)
+            self.notebook.add(self.sla_tab, text="Analisi SLA")
 
-        status = ttk.Label(status_frame,
-                           textvariable=self.status_var,
-                           style='Status.TLabel')
-        status.pack(side='left', fill='x', padx=5)
+            # Tab Test Analyzer
+            self.test_analyzer_tab = TestAnalyzerTab(self.notebook)
+            self.notebook.add(self.test_analyzer_tab.frame, text="Test Automatico")
 
-    def center_window(self):
-        """Centra la finestra sullo schermo"""
-        self.root.update_idletasks()
-        width = self.root.winfo_width()
-        height = self.root.winfo_height()
-        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
-        y = (self.root.winfo_screenheight() // 2) - (height // 2)
-        self.root.geometry(f'{width}x{height}+{x}+{y}')
-
-    def show_user_management(self):
-        """Mostra la finestra di gestione utenti (solo admin)"""
-        if self.user_role != 'admin':
-            messagebox.showerror("Errore", "Accesso non autorizzato")
-            return
-
-        if self.user_management_window is not None:
-            self.user_management_window.window.lift()
-            self.user_management_window.window.focus_force()
-        else:
-            self.user_management_window = UserManagementWindow(self.root)
-
-    def show_settings(self):
-        """Mostra la finestra delle impostazioni"""
-        settings_window = tk.Toplevel(self.root)
-        settings_window.title("Impostazioni")
-        settings_window.geometry("600x400")
-        settings_window.transient(self.root)
-        settings_window.grab_set()
-
-        # Implementa il contenuto delle impostazioni
-        ttk.Label(settings_window, text="Impostazioni").pack(pady=20)
-
-    def show_docs(self):
-        """Mostra la documentazione"""
-        webbrowser.open('https://github.com/SERGE3-g')
-
-    def show_about(self):
-        """Mostra informazioni sull'applicazione"""
-        about_text = f"""
-        Multi-Tool Analyzer v{self.VERSION}
-
-        Sviluppato da SergeGuea
-        © 2025 Tutti i diritti riservati
-
-        Per supporto: 
-        https://github.com/SERGE3-g
-        """
-        messagebox.showinfo("Info", about_text)
-
-    def show_contact(self):
-        """Mostra la finestra di contatto"""
-        contact_window = tk.Toplevel(self.root)
-        contact_window.title("Contattaci")
-        contact_window.geometry("400x300")
-        contact_window.transient(self.root)
-        contact_window.grab_set()
-
-        frame = ttk.Frame(contact_window, padding=20)
-        frame.pack(fill=tk.BOTH, expand=True)
-
-        contacts = [
-            ("Email:", "gueaserge@gmail.com"),
-            ("GitHub:", "https://github.com/SERGE3-g")
-        ]
-
-        for label, value in contacts:
-            ttk.Label(frame, text=f"{label} {value}").pack(pady=5)
-
-    def global_search(self, *args):
-        """Esegue una ricerca globale"""
-        search_text = self.search_var.get().lower()
-        if len(search_text) < 3:
-            return
-
-        results = []
-        for tab in [self.fiscal_tab, self.file_tab, self.inventory_tab,
-                    self.sla_tab, self.test_analyzer_tab]:
-            try:
-                tab_results = tab.search(search_text)
-                if tab_results:
-                    results.extend(tab_results)
-            except Exception as e:
-                print(f"Errore nella ricerca: {str(e)}")
-
-        if results:
-            self.show_search_results(results)
-        else:
-            self.status_var.set("Nessun risultato trovato")
-
-    def show_search_results(self, results):
-        """Mostra i risultati della ricerca"""
-        dialog = tk.Toplevel(self.root)
-        dialog.title("Risultati Ricerca")
-        dialog.geometry("600x400")
-
-        text = tk.Text(dialog, wrap=tk.WORD)
-        scrollbar = ttk.Scrollbar(dialog, orient='vertical', command=text.yview)
-        text.configure(yscrollcommand=scrollbar.set)
-
-        text.pack(side='left', fill='both', expand=True)
-        scrollbar.pack(side='right', fill='y')
-
-        for title, content in results:
-            text.insert('end', f"\n{title}\n", 'title')
-            text.insert('end', f"{content}\n", 'content')
-            text.insert('end', "-" * 50 + "\n", 'separator')
-
-        text.config(state='disabled')
+        except Exception as e:
+            logging.error(f"Errore creazione tab: {str(e)}")
+            messagebox.showerror("Errore", f"Impossibile creare i tab: {str(e)}")
+            raise
 
     def logout(self):
-        """Gestisce il logout"""
-        if messagebox.askyesno("Logout", "Vuoi effettuare il logout?"):
+        """Gestisce il logout dell'utente."""
+        try:
+            if messagebox.askyesno("Logout", "Vuoi davvero fare il logout?"):
+                # Distrugge la finestra principale
+                if self.root:
+                    self.root.destroy()
+
+                # Resetta i dati
+                self.current_user = None
+                self.user_role = None
+
+                # Riapre la finestra di login
+                from login_window import LoginWindow
+                login = LoginWindow(self.on_login_success)
+                login.root.mainloop()
+
+        except Exception as e:
+            logging.error(f"Errore durante il logout: {str(e)}")
+            messagebox.showerror("Errore", f"Impossibile effettuare il logout: {str(e)}")
+            sys.exit(1)
+
+    def on_closing(self):
+        """Chiusura dell'applicazione."""
+        try:
+            if messagebox.askokcancel("Esci", "Vuoi davvero uscire dall'applicazione?"):
+                logging.info(f"Applicazione chiusa dall'utente {self.current_user}")
+                self.root.destroy()
+                sys.exit(0)
+        except Exception as e:
+            logging.error(f"Errore durante la chiusura: {str(e)}")
             self.root.destroy()
-            self.start_login()
+            sys.exit(1)
 
-    def quit_app(self):
-        """Chiude l'applicazione"""
-        if messagebox.askokcancel("Esci", "Vuoi davvero uscire dall'applicazione?"):
-            self.root.quit()
-            sys.exit(0)
+    def open_user_management(self):
+        """Apre la finestra di gestione utenti (solo admin)."""
+        try:
+            if self.user_role != 'admin':
+                messagebox.showerror("Accesso Negato", "Solo gli admin possono gestire gli utenti.")
+                return
 
+            self.user_management_window = UserManagementWindow(self.root)
 
-class LoginWindow:
-    def __init__(self, callback):
-        self.root = tk.Tk()
-        self.root.title("Login")
-        self.callback = callback
-        self.create_gui()
+        except Exception as e:
+            logging.error(f"Errore apertura gestione utenti: {str(e)}")
+            messagebox.showerror("Errore", f"Impossibile aprire la gestione utenti: {str(e)}")
 
-    def create_gui(self):
-        frame = ttk.Frame(self.root, padding=20)
-        frame.pack(fill=tk.BOTH, expand=True)
+    def open_search(self):
+        """Apre la finestra di ricerca."""
+        try:
+            search_window = tk.Toplevel(self.root)
+            search_window.title("Cerca")
+            search_window.geometry("400x300")
 
-        ttk.Label(frame, text="Username:").pack(pady=5)
-        self.username = ttk.Entry(frame)
-        self.username.pack(pady=5)
+            search_label = tk.Label(search_window, text="Inserisci termine di ricerca:")
+            search_label.pack(pady=10)
 
-        ttk.Label(frame, text="Password:").pack(pady=5)
-        self.password = ttk.Entry(frame, show="*")
-        self.password.pack(pady=5)
+            search_entry = tk.Entry(search_window, textvariable=self.search_var, width=40)
+            search_entry.pack(pady=10)
 
-        ttk.Button(frame, text="Login", command=self.login).pack(pady=20)
+            search_button = tk.Button(search_window, text="Cerca",
+                                      command=self.perform_search)
+            search_button.pack(pady=10)
 
-    def login(self):
-        # Simulazione login - in produzione implementare autenticazione reale
-        username = self.username.get()
-        if username:
-            self.root.destroy()
-            self.callback(username, 'admin' if username == 'admin' else 'user')
-        else:
-            messagebox.showerror("Errore", "Inserire username")
+        except Exception as e:
+            logging.error(f"Errore apertura ricerca: {str(e)}")
+            messagebox.showerror("Errore", f"Impossibile aprire la ricerca: {str(e)}")
 
+    def perform_search(self):
+        """Esegue la ricerca su tutti i tab."""
+        search_term = self.search_var.get()
+        if not search_term:
+            messagebox.showinfo("Ricerca", "Inserisci un termine di ricerca.")
+            return
 
-class UserManagementWindow:
-    def __init__(self, parent):
-        self.window = tk.Toplevel(parent)
-        self.window.title("Gestione Utenti")
-        self.window.geometry("800x600")
-        self.create_gui()
+        try:
+            results = []
+            if self.fiscal_tab:
+                results.extend(self.fiscal_tab.search(search_term))
+            if self.file_tab:
+                results.extend(self.file_tab.search(search_term))
+            if self.inventory_tab:
+                results.extend(self.inventory_tab.search(search_term))
+            if self.sla_tab:
+                results.extend(self.sla_tab.search(search_term))
+            if self.test_analyzer_tab and hasattr(self.test_analyzer_tab, 'search'):
+                found = self.test_analyzer_tab.search(search_term)
+                if found:
+                    results.extend(found)
 
-    def create_gui(self):
-        frame = ttk.Frame(self.window, padding=20)
-        frame.pack(fill=tk.BOTH, expand=True)
-        ttk.Label(frame, text="Gestione Utenti").pack()
+            if results:
+                result_window = tk.Toplevel(self.root)
+                result_window.title(f"Risultati ricerca: {search_term}")
+                result_window.geometry("600x400")
 
+                result_text = tk.Text(result_window, wrap=tk.WORD)
+                result_text.pack(expand=True, fill='both', padx=10, pady=10)
 
-# Classi stub per le altre tab (da implementare)
-class FiscalTab:
-    def __init__(self, notebook):
-        self.frame = ttk.Frame(notebook)
-        notebook.add(self.frame, text='Fiscal')
-        ttk.Label(self.frame, text="Fiscal Analysis Tab").pack()
+                for item in results:
+                    # item potrebbe essere una tuple (title, content) o una string
+                    # adattalo alle tue strutture
+                    result_text.insert(tk.END, f"{item}\n")
 
-    def search(self, query):
-        return []
+                result_text.config(state=tk.DISABLED)
+            else:
+                messagebox.showinfo("Ricerca", "Nessun risultato trovato.")
 
+        except Exception as e:
+            logging.error(f"Errore durante la ricerca: {str(e)}")
+            messagebox.showerror("Errore", f"Errore durante la ricerca: {str(e)}")
 
-class FileTab:
-    def __init__(self, notebook):
-        self.frame = ttk.Frame(notebook)
-        notebook.add(self.frame, text='File')
-        ttk.Label(self.frame, text="File Analysis Tab").pack()
+    def open_settings(self):
+        """Apre la finestra delle impostazioni."""
+        try:
+            settings_window = tk.Toplevel(self.root)
+            settings_window.title("Impostazioni")
+            settings_window.geometry("400x300")
 
-    def search(self, query):
-        return []
+            theme_label = tk.Label(settings_window, text="Tema:")
+            theme_label.pack(pady=10)
 
+            themes = ["Chiaro", "Scuro", "Sistema"]
+            theme_var = tk.StringVar(value="Sistema")
+            theme_dropdown = ttk.Combobox(settings_window, textvariable=theme_var,
+                                          values=themes, state="readonly")
+            theme_dropdown.pack(pady=10)
 
-class InventoryTab:
-    def __init__(self, notebook):
-        self.frame = ttk.Frame(notebook)
-        notebook.add(self.frame, text='Inventory')
-        ttk.Label(self.frame, text="Inventory Management Tab").pack()
+            save_button = tk.Button(settings_window, text="Salva Impostazioni",
+                                    command=lambda: self.save_settings(theme_var.get()))
+            save_button.pack(pady=10)
 
-    def search(self, query):
-        return []
+        except Exception as e:
+            logging.error(f"Errore apertura impostazioni: {str(e)}")
+            messagebox.showerror("Errore", f"Impossibile aprire le impostazioni: {str(e)}")
 
+    def save_settings(self, theme):
+        """Salva le impostazioni (es. tema)."""
+        try:
+            logging.info(f"Impostazioni salvate - Tema: {theme}")
+            messagebox.showinfo("Impostazioni", "Impostazioni salvate con successo")
+        except Exception as e:
+            logging.error(f"Errore salvataggio impostazioni: {str(e)}")
+            messagebox.showerror("Errore", f"Impossibile salvare le impostazioni: {str(e)}")
 
-class SLATab:
-    def __init__(self, notebook):
-        self.frame = ttk.Frame(notebook)
-        notebook.add(self.frame, text='SLA')
-        self.create_gui()
+    def open_manual(self):
+        """Apre il manuale (PDF)."""
+        try:
+            manual_path = os.path.join(os.path.dirname(__file__), 'docs', 'manuale.pdf')
+            if os.path.exists(manual_path):
+                webbrowser.open(manual_path)
+            else:
+                messagebox.showinfo("Manuale", "Manuale non trovato")
+        except Exception as e:
+            logging.error(f"Errore apertura manuale: {str(e)}")
+            messagebox.showerror("Errore", f"Impossibile aprire il manuale: {str(e)}")
 
-    def create_gui(self):
-        """Crea l'interfaccia grafica del tab SLA"""
-        # Frame principale
-        main_frame = ttk.Frame(self.frame, padding=10)
-        main_frame.pack(fill=tk.BOTH, expand=True)
+    def show_about(self):
+        """Mostra informazioni su (About)."""
+        try:
+            about_window = tk.Toplevel(self.root)
+            about_window.title("Informazioni su")
+            about_window.geometry("400x300")
+            about_window.resizable(False, False)
 
-        # Sezione metriche SLA
-        metrics_frame = ttk.LabelFrame(main_frame, text="Metriche SLA", padding=10)
-        metrics_frame.pack(fill=tk.X, pady=5)
+            title_label = tk.Label(
+                about_window,
+                text="Business Intelligence Suite",
+                font=("Arial", 16, "bold")
+            )
+            title_label.pack(pady=10)
 
-        # Grid per le metriche
-        metrics = [
-            ("Tempo di Risposta", "4h", "95%"),
-            ("Risoluzione Ticket", "24h", "90%"),
-            ("Disponibilità Sistema", "99.9%", "99.95%"),
-            ("Customer Satisfaction", "4.5/5", "4.8/5")
-        ]
+            version_label = tk.Label(
+                about_window,
+                text=f"Versione {self.VERSION}",
+                font=("Arial", 12)
+            )
+            version_label.pack(pady=5)
 
-        for i, (metric, target, actual) in enumerate(metrics):
-            ttk.Label(metrics_frame, text=metric).grid(row=i, column=0, padx=5, pady=2, sticky='w')
-            ttk.Label(metrics_frame, text=f"Target: {target}").grid(row=i, column=1, padx=5, pady=2)
-            ttk.Label(metrics_frame, text=f"Attuale: {actual}").grid(row=i, column=2, padx=5, pady=2)
+            info_text = tk.Text(
+                about_window,
+                height=10,
+                width=50,
+                wrap=tk.WORD,
+                borderwidth=0,
+                font=("Arial", 10)
+            )
+            info_text.insert(
+                tk.END,
+                "Applicazione di Business Intelligence integrata.\n\n"
+                "Sviluppata per fornire analisi avanzate e strumenti "
+                "di gestione per aziende moderne.\n\n"
+                "© 2024 Tutti i diritti riservati."
+            )
+            info_text.config(state=tk.DISABLED)
+            info_text.pack(pady=10)
 
-        # Sezione report
-        report_frame = ttk.LabelFrame(main_frame, text="Report SLA", padding=10)
-        report_frame.pack(fill=tk.BOTH, expand=True, pady=5)
+            close_button = tk.Button(about_window, text="Chiudi", command=about_window.destroy)
+            close_button.pack(pady=10)
 
-        # Treeview per i report
-        columns = ('periodo', 'compliance', 'violazioni', 'note')
-        self.report_tree = ttk.Treeview(report_frame, columns=columns, show='headings')
-
-        # Configura colonne
-        self.report_tree.heading('periodo', text='Periodo')
-        self.report_tree.heading('compliance', text='Compliance')
-        self.report_tree.heading('violazioni', text='Violazioni')
-        self.report_tree.heading('note', text='Note')
-
-        # Inserisci dati di esempio
-        sample_data = [
-            ('Gen 2025', '98%', '2', 'Nessuna criticità'),
-            ('Feb 2025', '97%', '3', 'Manutenzione pianificata'),
-            ('Mar 2025', '99%', '1', 'Performance ottimale')
-        ]
-
-        for item in sample_data:
-            self.report_tree.insert('', tk.END, values=item)
-
-        # Scrollbar
-        scrollbar = ttk.Scrollbar(report_frame, orient=tk.VERTICAL, command=self.report_tree.yview)
-        self.report_tree.configure(yscrollcommand=scrollbar.set)
-
-        # Layout
-        self.report_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-        # Bottoni azioni
-        button_frame = ttk.Frame(main_frame)
-        button_frame.pack(fill=tk.X, pady=5)
-
-        ttk.Button(button_frame, text="Genera Report", command=self.generate_report).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="Esporta Dati", command=self.export_data).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="Configura Alert", command=self.configure_alerts).pack(side=tk.LEFT, padx=5)
-
-    def generate_report(self):
-        """Genera un nuovo report SLA"""
-        messagebox.showinfo("Report", "Generazione report in corso...")
-
-    def export_data(self):
-        """Esporta i dati SLA"""
-        filename = filedialog.asksaveasfilename(
-            defaultextension=".csv",
-            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]
-        )
-        if filename:
-            messagebox.showinfo("Export", f"Dati esportati in: {filename}")
-
-    def configure_alerts(self):
-        """Configura gli alert SLA"""
-        alert_window = tk.Toplevel(self.frame)
-        alert_window.title("Configurazione Alert")
-        alert_window.geometry("400x300")
-
-        ttk.Label(alert_window, text="Configurazione Alert SLA", font=('Arial', 12, 'bold')).pack(pady=10)
-
-        # Form configurazione
-        form_frame = ttk.Frame(alert_window, padding=10)
-        form_frame.pack(fill=tk.BOTH, expand=True)
-
-        ttk.Label(form_frame, text="Soglia Compliance:").pack(anchor='w')
-        ttk.Entry(form_frame).pack(fill=tk.X, pady=5)
-
-        ttk.Label(form_frame, text="Email Notifica:").pack(anchor='w')
-        ttk.Entry(form_frame).pack(fill=tk.X, pady=5)
-
-        ttk.Label(form_frame, text="Frequenza Check:").pack(anchor='w')
-        ttk.Combobox(form_frame, values=['1h', '4h', '12h', '24h']).pack(fill=tk.X, pady=5)
-
-        ttk.Button(form_frame, text="Salva Configurazione",
-                   command=lambda: alert_window.destroy()).pack(pady=20)
-
-    def search(self, query):
-        """Implementa la ricerca nel tab SLA"""
-        results = []
-        query = query.lower()
-
-        # Cerca nei report
-        for item in self.report_tree.get_children():
-            values = self.report_tree.item(item)['values']
-            if any(query in str(value).lower() for value in values):
-                results.append((
-                    f"SLA Report - {values[0]}",
-                    f"Compliance: {values[1]}\nViolazioni: {values[2]}\nNote: {values[3]}"
-                ))
-
-        return results
-
+        except Exception as e:
+            logging.error(f"Errore nella finestra About: {str(e)}")
+            messagebox.showerror("Errore", f"Impossibile mostrare le informazioni: {str(e)}")
 
 def main():
-    """Funzione principale per l'avvio dell'applicazione"""
     try:
-        # Impostazioni di base per l'applicazione
         if sys.platform.startswith('win'):
             import ctypes
             ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
-        # Creazione e avvio dell'applicazione
+        logging.info("=== Avvio Applicazione ===")
+        logging.info(f"Python versione: {sys.version}")
+        logging.info(f"Sistema operativo: {os.name}")
+        logging.info(f"Directory corrente: {os.getcwd()}")
+
         app = MainApp()
 
     except Exception as e:
+        logging.critical(f"Errore critico durante l'avvio: {str(e)}")
         messagebox.showerror(
             "Errore Critico",
             f"Errore durante l'avvio dell'applicazione:\n{str(e)}"
         )
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

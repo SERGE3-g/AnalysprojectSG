@@ -10,8 +10,8 @@ from fiscal_analyzer import FiscalTab
 from file_analyzer import FileTab
 from inventory_manager import InventoryTab
 from sla_analyzer import SLATab
-from login import LoginWindow
-from user_management import UserManagementWindow
+from src.login_window import LoginWindow
+from src.user_management import UserManagementWindow
 #from test_analyzer_tab import TestAnalyzerTab
 
 class MainApp:

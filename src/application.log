@@ -1,0 +1,30 @@
+2025-01-18 20:13:39,077 - INFO - === Avvio Applicazione ===
+2025-01-18 20:13:39,077 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-18 20:13:39,077 - INFO - Sistema operativo: posix
+2025-01-18 20:13:39,077 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-18 20:13:39,077 - INFO - Directory base: /Users/sergeguea/PycharmProjects/AnalysprojectSG
+2025-01-18 20:13:39,077 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data
+2025-01-18 20:13:39,077 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data/users.db
+2025-01-18 20:13:39,077 - INFO - Database non trovato. Inizializzazione...
+2025-01-18 20:13:39,085 - ERROR - Errore inizializzazione sistema: Errore nell'inizializzazione del database
+2025-01-18 20:13:39,085 - ERROR - Errore di inizializzazione: Errore nell'inizializzazione del database
+2025-01-18 21:01:24,139 - INFO - === Avvio Applicazione ===
+2025-01-18 21:01:24,139 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-18 21:01:24,139 - INFO - Sistema operativo: posix
+2025-01-18 21:01:24,139 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-18 21:01:24,139 - INFO - Directory base: /Users/sergeguea/PycharmProjects/AnalysprojectSG
+2025-01-18 21:01:24,139 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data
+2025-01-18 21:01:24,139 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data/users.db
+2025-01-18 21:01:24,139 - INFO - Database non trovato. Inizializzazione...
+2025-01-18 21:01:24,146 - ERROR - Errore inizializzazione sistema: Errore nell'inizializzazione del database
+2025-01-18 21:01:24,146 - ERROR - Errore di inizializzazione: Errore nell'inizializzazione del database
+2025-01-19 02:21:10,242 - INFO - === Avvio Applicazione ===
+2025-01-19 02:21:10,242 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-19 02:21:10,242 - INFO - Sistema operativo: posix
+2025-01-19 02:21:10,242 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-19 02:21:10,242 - INFO - Directory base: /Users/sergeguea/PycharmProjects/AnalysprojectSG
+2025-01-19 02:21:10,242 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data
+2025-01-19 02:21:10,242 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data/users.db
+2025-01-19 02:21:10,242 - INFO - Database non trovato. Inizializzazione...
+2025-01-19 02:21:10,248 - ERROR - Errore inizializzazione sistema: Errore nell'inizializzazione del database
+2025-01-19 02:21:10,248 - ERROR - Errore di inizializzazione: Errore nell'inizializzazione del database

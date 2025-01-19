@@ -4,11 +4,11 @@ import re
 import os
 from datetime import datetime
 
-
-class FiscalTab:
-    def __init__(self, notebook):
-        self.frame = ttk.Frame(notebook)
-        notebook.add(self.frame, text='Codici Fiscali')
+class FiscalTab(ttk.Frame):
+    def __init__(self, parent, current_user, user_role):
+        super().__init__(parent)
+        self.current_user = current_user
+        self.user_role = user_role
 
         # Dizionario dei comuni italiani con codici catastali
         self.load_city_codes()
@@ -24,13 +24,13 @@ class FiscalTab:
             "Bologna": "A944", "Firenze": "D612", "Bari": "A662",
             "Catania": "C351", "Venezia": "L736", "Verona": "L781",
             "Latina": "E472", "Aprilia": "A341", "Bassiano": "A707",
-            # Aggiungi altri comuni...
+            # Aggiungi altri comuni se necessario...
         }
 
     def create_gui(self):
         """Crea l'interfaccia grafica"""
         # Notebook interno per le sotto-schede
-        self.tabs = ttk.Notebook(self.frame)
+        self.tabs = ttk.Notebook(self)
         self.tabs.pack(expand=True, fill='both', padx=5, pady=5)
 
         # Crea le sotto-schede
@@ -204,6 +204,7 @@ class FiscalTab:
             # Calcola nome
             consonants_name = get_consonants(name)
             if len(consonants_name) > 3:
+                # Se il nome ha più di 3 consonanti, prendi 1ª, 3ª e 4ª
                 name_code = consonants_name[0] + consonants_name[2] + consonants_name[3]
             else:
                 vowels_name = get_vowels(name)
@@ -246,16 +247,17 @@ class FiscalTab:
 
             # Mostra risultato
             self.result_text.delete(1.0, tk.END)
-            self.result_text.insert(tk.END,
-                                    f"Codice Fiscale generato:\n"
-                                    f"{fiscal_code}\n\n"
-                                    f"Dettagli:\n"
-                                    f"Cognome: {surname} → {surname_code}\n"
-                                    f"Nome: {name} → {name_code}\n"
-                                    f"Data: {birth_date} → {year_code}{month_code}{day_code}\n"
-                                    f"Genere: {gender}\n"
-                                    f"Comune: {city} → {city_code}\n"
-                                    f"Carattere controllo: {control_char}")
+            self.result_text.insert(
+                tk.END,
+                f"Codice Fiscale generato:\n{fiscal_code}\n\n"
+                f"Dettagli:\n"
+                f"Cognome: {surname} → {surname_code}\n"
+                f"Nome: {name} → {name_code}\n"
+                f"Data: {birth_date} → {year_code}{month_code}{day_code}\n"
+                f"Genere: {gender}\n"
+                f"Comune: {city} → {city_code}\n"
+                f"Carattere controllo: {control_char}"
+            )
 
             return fiscal_code
 
@@ -272,6 +274,7 @@ class FiscalTab:
             if not code:
                 raise ValueError("Inserisci un codice fiscale")
 
+            # Pattern base per la lunghezza e forma del CF
             if not re.match(r'^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$', code):
                 raise ValueError("Formato codice fiscale non valido")
 
@@ -289,7 +292,7 @@ class FiscalTab:
             if month_code not in month_codes:
                 raise ValueError("Codice mese non valido")
 
-            # Verifica giorno
+            # Verifica giorno + genere
             day = int(day_code)
             if day > 40:
                 day -= 40
@@ -301,16 +304,16 @@ class FiscalTab:
                 raise ValueError("Giorno non valido")
 
             # Verifica carattere di controllo
-            def calc_control_char(code):
-                even_sum = sum(ord(c) for i, c in enumerate(code) if i % 2 == 1)
+            def calc_control_char(code15):
+                even_sum = sum(ord(c) for i, c in enumerate(code15) if i % 2 == 1)
                 odd_map = {
                     '0': 1, '1': 0, '2': 5, '3': 7, '4': 9, '5': 13, '6': 15, '7': 17,
-                    '8': 19, '9': 21, 'A': 1, 'B': 0, 'C': 5, 'D': 7,'8':19, '9':21, 'A':1, 'B':0, 'C':5, 'D':7, 'E':9, 'F':13,
-                    'G':15, 'H':17, 'I':19, 'J':21, 'K':2, 'L':4, 'M':18, 'N':20,
-                    'O':11, 'P':3, 'Q':6, 'R':8, 'S':12, 'T':14, 'U':16, 'V':10,
-                    'W':22, 'X':25, 'Y':24, 'Z':23
+                    '8': 19, '9': 21, 'A': 1, 'B': 0, 'C': 5, 'D': 7, 'E': 9, 'F': 13,
+                    'G': 15, 'H': 17, 'I': 19, 'J': 21, 'K': 2, 'L': 4, 'M': 18, 'N': 20,
+                    'O': 11, 'P': 3, 'Q': 6, 'R': 8, 'S': 12, 'T': 14, 'U': 16, 'V': 10,
+                    'W': 22, 'X': 25, 'Y': 24, 'Z': 23
                 }
-                odd_sum = sum(odd_map[c] for i, c in enumerate(code) if i % 2 == 0)
+                odd_sum = sum(odd_map[c] for i, c in enumerate(code15) if i % 2 == 0)
                 total = odd_sum + even_sum
                 return chr(65 + (total % 26))
 
@@ -318,7 +321,9 @@ class FiscalTab:
             if control_char != expected_control:
                 raise ValueError("Carattere di controllo non valido")
 
-            self.validate_text.insert(tk.END,
+            # Se arrivo qui, il CF è valido
+            self.validate_text.insert(
+                tk.END,
                 f"Il codice fiscale è valido!\n\n"
                 f"Analisi:\n"
                 f"Cognome: {surname_code}\n"
@@ -327,7 +332,8 @@ class FiscalTab:
                 f"Mese: {month_code}\n"
                 f"Giorno: {day} ({gender})\n"
                 f"Comune: {city_code}\n"
-                f"Controllo: {control_char}")
+                f"Controllo: {control_char}"
+            )
 
         except Exception as e:
             self.validate_text.insert(tk.END, f"Codice non valido: {str(e)}")
@@ -351,8 +357,8 @@ class FiscalTab:
     def analyze_files(self, files):
         """Analizza i file per trovare codici fiscali"""
         self.analyze_text.delete(1.0, tk.END)
-
         total_found = 0
+
         for file_path in files:
             try:
                 with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -368,16 +374,17 @@ class FiscalTab:
                 file_count = 0
                 for match in found_codes:
                     code = match.group().upper()
+                    # Prova a validare ogni codice trovato
+                    self.validate_entry.delete(0, tk.END)
+                    self.validate_entry.insert(0, code)
+
+                    # Se non ci sono eccezioni, è valido
                     try:
-                        # Valida ogni codice trovato
-                        self.validate_entry.delete(0, tk.END)
-                        self.validate_entry.insert(0, code)
                         self.validate_fiscal_code()
                         status = "✓ Valido"
-                    except Exception as e:
+                    except:
                         status = "✗ Non valido"
 
-                    # Mostra risultato con posizione nel file
                     pos = match.start()
                     self.analyze_text.insert(tk.END,
                         f"Posizione {pos}: {code} - {status}\n")
@@ -392,15 +399,17 @@ class FiscalTab:
                     total_found += file_count
 
             except Exception as e:
-                messagebox.showerror("Errore",
-                    f"Errore nell'analisi del file {file_path}: {str(e)}")
+                messagebox.showerror(
+                    "Errore",
+                    f"Errore nell'analisi del file {file_path}: {str(e)}"
+                )
 
         if total_found > 0:
             self.analyze_text.insert(tk.END,
                 f"\nTotale codici fiscali trovati: {total_found}")
 
     def clear_fields(self):
-        """Pulisce tutti i campi di input"""
+        """Pulisce i campi di input"""
         for entry in self.entries.values():
             entry.delete(0, tk.END)
         self.city_var.set('')
@@ -409,30 +418,36 @@ class FiscalTab:
         self.result_text.delete(1.0, tk.END)
 
     def copy_to_clipboard(self):
-        """Copia il codice fiscale negli appunti"""
+        """Copia il codice fiscale generato negli appunti"""
         text = self.result_text.get(1.0, tk.END)
         code = re.search(r'[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]', text)
         if code:
-            self.frame.clipboard_clear()
-            self.frame.clipboard_append(code.group(0))
-            self.frame.update()
+            # Poiché FiscalTab è un Frame, possiamo usare self (ereditato da tk)
+            self.clipboard_clear()
+            self.clipboard_append(code.group(0))
+            self.update()  # forza l'aggiornamento dell'UI
             messagebox.showinfo("Info", "Codice fiscale copiato negli appunti!")
         else:
             messagebox.showwarning("Attenzione",
                 "Genera prima un codice fiscale!")
 
     def search(self, text):
-        """Ricerca nel tab (per ricerca globale)"""
+        """
+        Ricerca nel tab (per la ricerca globale).
+        Ritorna una lista di tuple (nome_area, contenuto)
+        se il testo è presente.
+        """
         results = []
 
-        # Cerca nei risultati generati
+        # Cerca nei risultati generati (result_text)
         result_content = self.result_text.get(1.0, tk.END)
-        if text in result_content.lower():
+        if text.lower() in result_content.lower():
             results.append(("Codice Fiscale", result_content.strip()))
 
-        # Cerca nei risultati delle analisi
+        # Cerca nei risultati delle analisi (analyze_text)
         analyze_content = self.analyze_text.get(1.0, tk.END)
-        if text in analyze_content.lower():
+        if text.lower() in analyze_content.lower():
             results.append(("Analisi File", analyze_content.strip()))
 
         return results
+

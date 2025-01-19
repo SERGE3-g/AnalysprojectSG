@@ -23,7 +23,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('test_analyzer.log'),
+        logging.FileHandler('../static/test_analyzer.log'),
         logging.StreamHandler(sys.stdout)
     ]
 )

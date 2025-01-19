@@ -9,11 +9,14 @@ from openpyxl import Workbook
 from openpyxl.drawing.image import Image
 import os
 
-
-class InventoryTab:
-    def __init__(self, notebook):
-        self.frame = ttk.Frame(notebook)
-        notebook.add(self.frame, text='Inventario')
+class InventoryTab(ttk.Frame):
+    def __init__(self, parent, current_user, user_role):
+        """
+        Inizializza il tab inventario come Frame, ereditando da ttk.Frame.
+        """
+        super().__init__(parent)
+        self.current_user = current_user
+        self.user_role = user_role
 
         # Configurazione database
         self.DB_NAME = "data/inventario.db"
@@ -26,17 +29,19 @@ class InventoryTab:
             "Giocattoli scientifici", "Giocattoli elettronici", "Giocattoli all'aperto",
             "Peluche", "Figurines", "Giocattoli di ruolo"
         ]
-
         self.marche = [
             "LEGO", "Mattel", "Hasbro", "Clementoni", "Chicco", "Ravensburger",
             "Playmobil", "Giochi Preziosi"
         ]
 
-        # Setup GUI
+        # Costruisce interfaccia
         self.create_gui()
 
+        # Carica in tabella
+        self.refresh_table()
+
     def create_database(self):
-        """Crea il database se non esiste"""
+        """Crea il database e la tabella inventario se non esiste."""
         os.makedirs('data', exist_ok=True)
         conn = sqlite3.connect(self.DB_NAME)
         cursor = conn.cursor()
@@ -62,22 +67,21 @@ class InventoryTab:
         conn.close()
 
     def create_gui(self):
-        """Crea l'interfaccia grafica"""
+        """Costruisce l'interfaccia grafica all'interno del frame."""
         # Form di inserimento
         self.create_input_form()
 
         # Tabella prodotti
         self.create_products_table()
 
-        # Frame azioni
+        # Pulsanti di azione
         self.create_action_buttons()
 
     def create_input_form(self):
-        """Crea il form di inserimento prodotti"""
-        input_frame = ttk.LabelFrame(self.frame, text="Inserimento Prodotto", padding=10)
+        """Crea il form di inserimento prodotti."""
+        input_frame = ttk.LabelFrame(self, text="Inserimento Prodotto", padding=10)
         input_frame.pack(fill='x', padx=5, pady=5)
 
-        # Griglia di input
         self.entries = {}
         row = 0
 
@@ -139,11 +143,10 @@ class InventoryTab:
         input_frame.columnconfigure(1, weight=1)
 
     def create_products_table(self):
-        """Crea la tabella dei prodotti"""
-        table_frame = ttk.LabelFrame(self.frame, text="Prodotti", padding=10)
+        """Crea la tabella dei prodotti."""
+        table_frame = ttk.LabelFrame(self, text="Prodotti", padding=10)
         table_frame.pack(fill='both', expand=True, padx=5, pady=5)
 
-        # Tabella
         columns = (
             'id', 'nome', 'categoria', 'marca', 'quantita',
             'prezzo_acquisto', 'prezzo_vendita', 'iva',
@@ -152,26 +155,24 @@ class InventoryTab:
 
         self.tree = ttk.Treeview(table_frame, columns=columns, show='headings')
 
-        # Configurazione colonne
         for col in columns:
             self.tree.heading(col, text=col.title())
             self.tree.column(col, width=100)
 
-        # Scrollbars
         y_scroll = ttk.Scrollbar(table_frame, orient='vertical', command=self.tree.yview)
         x_scroll = ttk.Scrollbar(table_frame, orient='horizontal', command=self.tree.xview)
         self.tree.configure(yscrollcommand=y_scroll.set, xscrollcommand=x_scroll.set)
 
-        # Layout
         self.tree.grid(row=0, column=0, sticky='nsew')
         y_scroll.grid(row=0, column=1, sticky='ns')
         x_scroll.grid(row=1, column=0, sticky='ew')
+
         table_frame.columnconfigure(0, weight=1)
         table_frame.rowconfigure(0, weight=1)
 
     def create_action_buttons(self):
-        """Crea i pulsanti delle azioni"""
-        button_frame = ttk.Frame(self.frame)
+        """Crea i pulsanti delle azioni."""
+        button_frame = ttk.Frame(self)
         button_frame.pack(fill='x', padx=5, pady=5)
 
         ttk.Button(button_frame, text="Aggiungi",
@@ -186,25 +187,21 @@ class InventoryTab:
                    command=self.export_excel).pack(side='left', padx=2)
 
     def refresh_table(self):
-        """Aggiorna la tabella dei prodotti"""
-        # Pulisci tabella
+        """Aggiorna la tabella dei prodotti dal database."""
         for item in self.tree.get_children():
             self.tree.delete(item)
 
-        # Ricarica dati
         conn = sqlite3.connect(self.DB_NAME)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM inventario ORDER BY id DESC")
-
         for row in cursor.fetchall():
             self.tree.insert("", 0, values=row)
 
         conn.close()
 
     def add_product(self):
-        """Aggiunge un nuovo prodotto"""
+        """Aggiunge un nuovo prodotto nel database e aggiorna la tabella."""
         try:
-            # Validazione input
             nome = self.entries['nome'].get().strip()
             categoria = self.entries['categoria'].get().strip()
             marca = self.entries['marca'].get().strip()
@@ -216,15 +213,15 @@ class InventoryTab:
             note = self.entries['note'].get().strip()
 
             if not all([nome, categoria, quantita, prezzo_acquisto, iva, scaffale, data_controllo]):
-                raise ValueError("Tutti i campi sono obbligatori tranne Note")
+                raise ValueError("Tutti i campi sono obbligatori (tranne Note).")
 
-            # Calcola prezzo vendita
+            # Calcola prezzo di vendita
             prezzo_vendita = round(prezzo_acquisto + (prezzo_acquisto * iva / 100), 2)
 
             # Genera codice a barre
             codice_barre = self.generate_barcode()
 
-            # Inserisci nel database
+            # Inserisci nel DB
             conn = sqlite3.connect(self.DB_NAME)
             cursor = conn.cursor()
             cursor.execute("""
@@ -242,10 +239,9 @@ class InventoryTab:
             conn.commit()
             conn.close()
 
-            # Genera QR Code
+            # Genera il QR code
             self.generate_qrcode(codice_barre, nome)
 
-            # Aggiorna tabella
             self.refresh_table()
             messagebox.showinfo("Successo", "Prodotto aggiunto con successo!")
 
@@ -255,57 +251,37 @@ class InventoryTab:
             messagebox.showerror("Errore", f"Errore durante l'inserimento: {str(e)}")
 
     def generate_barcode(self):
-        """Genera un codice a barre univoco"""
+        """Genera un codice a barre univoco (stringa)."""
         conn = sqlite3.connect(self.DB_NAME)
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM inventario")
         count = cursor.fetchone()[0]
         conn.close()
-
         return str(100000000000 + count + 1)
 
     def generate_qrcode(self, code, name):
-        """Genera un QR code per il prodotto"""
-        if not os.path.exists('qrcodes'):
-            os.makedirs('qrcodes')
+        """Genera un QR code e lo salva in /qrcodes."""
+        os.makedirs('qrcodes', exist_ok=True)
 
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(code)
         qr.make(fit=True)
 
         img = qr.make_image(fill_color="black", back_color="white")
-        img.save(f"qrcodes/{name}_{code}.png")
-
-    def search(self, text):
-        """Ricerca nei prodotti (per ricerca globale)"""
-        results = []
-
-        conn = sqlite3.connect(self.DB_NAME)
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT * FROM inventario 
-            WHERE nome LIKE ? OR categoria LIKE ? OR marca LIKE ? OR note LIKE ?
-        """, tuple([f"%{text}%"] * 4))
-
-        for row in cursor.fetchall():
-            results.append(("Prodotto",
-                            f"{row[1]} ({row[2]}) - {row[3]} - €{row[5]}"))
-
-        conn.close()
-        return results
+        file_path = f"qrcodes/{name}_{code}.png"
+        img.save(file_path)
 
     def edit_product(self):
-        """Modifica un prodotto selezionato"""
+        """Modifica un prodotto selezionato."""
         selected = self.tree.selection()
         if not selected:
-            messagebox.showwarning("Attenzione", "Seleziona un prodotto da modificare")
+            messagebox.showwarning("Attenzione", "Seleziona un prodotto da modificare.")
             return
 
         item = self.tree.item(selected[0])
         product_id = item['values'][0]
 
-        # Crea finestra di modifica
-        edit_window = tk.Toplevel(self.frame)
+        edit_window = tk.Toplevel(self)
         edit_window.title("Modifica Prodotto")
         edit_window.geometry("500x600")
 
@@ -315,41 +291,53 @@ class InventoryTab:
         row = 0
         edit_entries = {}
 
-        # Crea campi per la modifica
-        for field in ['nome', 'categoria', 'marca', 'quantita', 'prezzo_acquisto',
-                      'iva', 'scaffale', 'data_controllo', 'note']:
+        # Mappa campo->indice in item['values']
+        field_index = {
+            'nome': 1,
+            'categoria': 2,
+            'marca': 3,
+            'quantita': 4,
+            'prezzo_acquisto': 5,
+            'prezzo_vendita': 6,  # non lo modifichiamo direttamente
+            'iva': 7,
+            'scaffale': 8,
+            'data_controllo': 9,
+            'codice_barre': 10,  # non lo modifichiamo direttamente
+            'note': 11
+        }
+
+        # Campi da modificare
+        fields_to_edit = [
+            'nome', 'categoria', 'marca', 'quantita',
+            'prezzo_acquisto', 'iva', 'scaffale',
+            'data_controllo', 'note'
+        ]
+
+        for field in fields_to_edit:
             ttk.Label(edit_frame, text=field.title() + ":").grid(
                 row=row, column=0, sticky='e', padx=5, pady=2
             )
-
-            if field in ['categoria', 'marca']:
-                edit_entries[field] = ttk.Combobox(
-                    edit_frame,
-                    values=self.categorie if field == 'categoria' else self.marche
-                )
+            if field in ['categoria']:
+                widget = ttk.Combobox(edit_frame, values=self.categorie)
+            elif field in ['marca']:
+                widget = ttk.Combobox(edit_frame, values=self.marche)
             else:
-                edit_entries[field] = ttk.Entry(edit_frame)
+                widget = ttk.Entry(edit_frame)
 
-            field_index = {
-                'nome': 1, 'categoria': 2, 'marca': 3, 'quantita': 4,
-                'prezzo_acquisto': 5, 'iva': 7, 'scaffale': 8,
-                'data_controllo': 9, 'note': 11
-            }
+            # Inserisci valore esistente
+            index = field_index[field]
+            old_value = item['values'][index]
+            if old_value is not None:
+                widget.insert(0, str(old_value))
 
-            if field in field_index:
-                value = item['values'][field_index[field]]
-                edit_entries[field].insert(0, str(value) if value is not None else '')
-
-            edit_entries[field].grid(row=row, column=1, sticky='ew', padx=5)
+            widget.grid(row=row, column=1, sticky='ew', padx=5)
+            edit_entries[field] = widget
             row += 1
 
-        # Bottoni azione
-        button_frame = ttk.Frame(edit_frame)
-        button_frame.grid(row=row, column=0, columnspan=2, pady=10)
+        edit_frame.columnconfigure(1, weight=1)
 
         def save_changes():
             try:
-                # Valida input
                 nome = edit_entries['nome'].get().strip()
                 categoria = edit_entries['categoria'].get().strip()
                 marca = edit_entries['marca'].get().strip()
@@ -361,12 +349,12 @@ class InventoryTab:
                 note = edit_entries['note'].get().strip()
 
                 if not all([nome, categoria, quantita, prezzo_acquisto, iva, scaffale, data_controllo]):
-                    raise ValueError("Tutti i campi sono obbligatori tranne Note")
+                    raise ValueError("Tutti i campi sono obbligatori (tranne Note).")
 
-                # Calcola prezzo vendita
+                # Calcolo nuovo prezzo di vendita
                 prezzo_vendita = round(prezzo_acquisto + (prezzo_acquisto * iva / 100), 2)
 
-                # Aggiorna database
+                # Aggiorna DB
                 conn = sqlite3.connect(self.DB_NAME)
                 cursor = conn.cursor()
                 cursor.execute("""
@@ -386,11 +374,13 @@ class InventoryTab:
                 self.refresh_table()
                 edit_window.destroy()
                 messagebox.showinfo("Successo", "Prodotto aggiornato con successo!")
-
             except ValueError as e:
                 messagebox.showerror("Errore", str(e))
             except Exception as e:
                 messagebox.showerror("Errore", f"Errore durante l'aggiornamento: {str(e)}")
+
+        button_frame = ttk.Frame(edit_frame)
+        button_frame.grid(row=row, column=0, columnspan=2, pady=10)
 
         ttk.Button(button_frame, text="Salva",
                    command=save_changes).pack(side='left', padx=5)
@@ -398,17 +388,15 @@ class InventoryTab:
                    command=edit_window.destroy).pack(side='left')
 
     def delete_product(self):
-        """Elimina un prodotto selezionato."""
-        selected = self.tree.selection()  # Ottieni l'elemento selezionato
+        """Elimina il prodotto selezionato."""
+        selected = self.tree.selection()
         if not selected:
-            messagebox.showwarning("Attenzione", "Seleziona un prodotto da eliminare")
+            messagebox.showwarning("Attenzione", "Seleziona un prodotto da eliminare.")
             return
 
-        # Recupera l'ID del prodotto selezionato
         item = self.tree.item(selected[0])
         product_id = item['values'][0]
 
-        # Conferma eliminazione
         response = messagebox.askyesno(
             "Conferma eliminazione",
             "Sei sicuro di voler eliminare il prodotto selezionato?"
@@ -416,7 +404,6 @@ class InventoryTab:
         if not response:
             return
 
-        # Elimina dal database
         try:
             conn = sqlite3.connect(self.DB_NAME)
             cursor = conn.cursor()
@@ -424,25 +411,22 @@ class InventoryTab:
             conn.commit()
             conn.close()
 
-            # Aggiorna la tabella
             self.refresh_table()
             messagebox.showinfo("Successo", "Prodotto eliminato con successo!")
         except Exception as e:
             messagebox.showerror("Errore", f"Errore durante l'eliminazione: {str(e)}")
 
     def generate_pdf(self):
-        """Genera un report PDF dell'inventario"""
+        """Genera un report PDF dell'inventario."""
         try:
             file_path = filedialog.asksaveasfilename(
                 defaultextension=".pdf",
                 filetypes=[("PDF files", "*.pdf")],
                 initialfile=f"inventario_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
             )
-
             if not file_path:
                 return
 
-            # Ottieni dati
             conn = sqlite3.connect(self.DB_NAME)
             cursor = conn.cursor()
             cursor.execute("""
@@ -455,31 +439,28 @@ class InventoryTab:
             data = cursor.fetchall()
             conn.close()
 
-            # Crea PDF
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+            from reportlab.lib import colors
+
             doc = SimpleDocTemplate(file_path)
             elements = []
 
-            # Intestazione
             headers = [
                 "Nome", "Categoria", "Marca", "Quantità",
                 "Prezzo Acquisto", "Prezzo Vendita", "IVA",
                 "Scaffale", "Data Controllo"
             ]
-
             table_data = [headers]
             table_data.extend(data)
 
-            # Calcola totali
+            # Calcolo totali
             total_items = sum(row[3] for row in data)
-            total_value = sum(row[3] * row[4] for row in data)  # quantità * prezzo acquisto
-
-            # Aggiungi riga totali
+            total_value = sum(row[3] * row[4] for row in data)  # quantità * prezzo_acquisto
             table_data.append([
                 "TOTALE", "", "", total_items,
                 total_value, "", "", "", ""
             ])
 
-            # Crea tabella
             table = Table(table_data)
             table.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
@@ -503,30 +484,29 @@ class InventoryTab:
             messagebox.showerror("Errore", f"Errore nella generazione del PDF: {str(e)}")
 
     def export_excel(self):
-        """Esporta l'inventario in Excel"""
+        """Esporta l'inventario in un file Excel."""
         try:
             file_path = filedialog.asksaveasfilename(
                 defaultextension=".xlsx",
                 filetypes=[("Excel files", "*.xlsx")],
                 initialfile=f"inventario_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
             )
-
             if not file_path:
                 return
 
-            # Ottieni dati
             conn = sqlite3.connect(self.DB_NAME)
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM inventario ORDER BY categoria, nome")
             data = cursor.fetchall()
             conn.close()
 
-            # Crea Excel
+            from openpyxl import Workbook
+            from openpyxl.drawing.image import Image
+
             wb = Workbook()
             ws = wb.active
             ws.title = "Inventario"
 
-            # Intestazioni
             headers = [
                 "ID", "Nome", "Categoria", "Marca", "Quantità",
                 "Prezzo Acquisto", "Prezzo Vendita", "IVA",
@@ -534,26 +514,25 @@ class InventoryTab:
             ]
             ws.append(headers)
 
-            # Aggiungi dati
+            # Aggiunge i dati
             for row in data:
                 ws.append(row)
 
-            # Aggiungi QR codes
-            for idx, row in enumerate(data, start=2):  # start=2 perché la riga 1 è l'intestazione
+            # Inserisce i QR code se presenti
+            for idx, row in enumerate(data, start=2):
                 nome = row[1]
                 codice = row[10]
                 qr_path = f"qrcodes/{nome}_{codice}.png"
                 if os.path.exists(qr_path):
                     img = Image(qr_path)
-                    cell = ws.cell(row=idx, column=len(headers) + 1)
+                    cell = ws.cell(row=idx, column=len(headers)+1)
                     ws.add_image(img, cell.coordinate)
 
-            # Formattazione
+            # Adatta larghezza colonne
             for column_cells in ws.columns:
-                length = max(len(str(cell.value)) for cell in column_cells)
+                length = max(len(str(cell.value)) for cell in column_cells if cell.value)
                 ws.column_dimensions[column_cells[0].column_letter].width = length + 2
 
-            # Salva
             wb.save(file_path)
             messagebox.showinfo("Successo", "File Excel generato con successo!")
 
@@ -561,11 +540,36 @@ class InventoryTab:
             messagebox.showerror("Errore", f"Errore nell'esportazione Excel: {str(e)}")
 
     def clear_form(self):
-        """Pulisce il form di inserimento"""
+        """Pulisce i campi di input."""
         for entry in self.entries.values():
             if isinstance(entry, ttk.Entry):
                 entry.delete(0, tk.END)
-            else:  # Combobox
+            elif isinstance(entry, ttk.Combobox):
                 entry.set("")
 
+        self.entries['data_controllo'].delete(0, tk.END)
         self.entries['data_controllo'].insert(0, datetime.now().strftime('%d/%m/%Y'))
+
+    def search(self, text):
+        """
+        Ricerca nei prodotti per la 'ricerca globale'
+        e ritorna una lista di tuple (nome_area, risultato).
+        """
+        results = []
+
+        conn = sqlite3.connect(self.DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT * FROM inventario 
+            WHERE nome LIKE ? OR categoria LIKE ? OR marca LIKE ? OR note LIKE ?
+        """, (f"%{text}%", f"%{text}%", f"%{text}%", f"%{text}%"))
+
+        for row in cursor.fetchall():
+            # row: (id, nome, categoria, marca, quantita, prezzo_acquisto, ...)
+            results.append((
+                "Prodotto",
+                f"{row[1]} (Cat: {row[2]}) - Marca: {row[3]} - Prezzo: {row[6]:.2f}"
+            ))
+
+        conn.close()
+        return results
