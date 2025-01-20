@@ -1,12 +1,16 @@
-from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-                             QTextEdit, QPushButton, QLabel, QComboBox, QMessageBox,
-                             QStatusBar, QToolBar, QAction, QFileDialog, QSpinBox,
-                             QSplitter, QTableView, QHeaderView)
+from PyQt5.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QTextEdit, QPushButton, QLabel, QComboBox, QMessageBox,
+    QStatusBar, QToolBar, QAction, QFileDialog, QSpinBox,
+    QSplitter, QTableView, QHeaderView
+)
 from PyQt5.QtCore import Qt, QSize, pyqtSignal, QTimer
 from PyQt5.QtGui import QIcon, QTextCursor, QStandardItemModel, QStandardItem
+
 from app.nlp import NLPProcessor
 from app.query_generator import QueryGenerator
 from app.database import DatabaseManager
+
 import json
 import os
 from datetime import datetime
@@ -74,7 +78,7 @@ class MainWindow(QMainWindow):
         self.query_type.currentTextChanged.connect(self.on_query_type_changed)
         query_controls.addWidget(self.query_type)
 
-        # Settings per la query
+        # SpinBox Limite
         self.limit_spin = QSpinBox()
         self.limit_spin.setRange(1, 1000)
         self.limit_spin.setValue(100)
@@ -186,8 +190,23 @@ class MainWindow(QMainWindow):
 
     def setup_shortcuts(self):
         """Configura le scorciatoie da tastiera"""
-        # Ctrl+Enter per inviare il messaggio
+        # Ctrl+Enter per inviare il messaggio (implementabile come event filter)
         self.input_field.installEventFilter(self)
+
+    def eventFilter(self, source, event):
+        """Event filter per catturare Ctrl+Invio"""
+        if (event.type() == event.KeyPress and
+            (event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter) and
+            (event.modifiers() & Qt.ControlModifier)):
+
+            if source is self.input_field:
+                self.process_input()
+                return True
+        return super().eventFilter(source, event)
+
+    def on_query_type_changed(self, new_type):
+        """Se cambia il tipo di query nel comboBox"""
+        self.statusBar().showMessage(f"Tipo di Query selezionato: {new_type}", 3000)
 
     def process_input(self):
         """Elabora l'input dell'utente e genera una risposta"""
@@ -202,17 +221,19 @@ class MainWindow(QMainWindow):
             # Analizza il testo
             nlp_result = self.nlp_processor.process_text(user_input)
 
-            # Determina l'intento
-            intent_result = self.nlp_processor.get_query_intent(user_input)
+            # Determina l'intento (esempio ipotetico, se avessi una get_query_intent)
+            # Se non esiste, puoi sostituire con logiche personalizzate
+            if hasattr(self.nlp_processor, "get_query_intent"):
+                intent_result = self.nlp_processor.get_query_intent(user_input)
+            else:
+                intent_result = "select"  # fallback
 
             # Prepara i parametri della query
             query_params = self.prepare_query_params(nlp_result, intent_result)
 
             # Genera la query
-            query = self.query_generator.generate_query(
-                self.query_type.currentText().lower(),
-                query_params
-            )
+            query_text = self.query_type.currentText().lower()
+            query = self.query_generator.generate_query(query_text, query_params)
 
             # Esegue la query
             results = self.db_manager.execute_query(query)
@@ -236,10 +257,11 @@ class MainWindow(QMainWindow):
         params = {
             'table': 'example_table',
             'columns': '*',
-            'conditions': '1=1'
+            'conditions': '1=1',
+            # Ecc. Altri parametri a seconda dell'intento
         }
 
-        # Usa i risultati NLP per migliorare i parametri
+        # Se avessi entità riconosciute come "TABLE" o "COLUMN", potresti popolare param in base a nlp_result
         if 'entities' in nlp_result:
             for entity, label in nlp_result['entities']:
                 if label == 'TABLE':
@@ -368,3 +390,15 @@ class MainWindow(QMainWindow):
             settings = {
                 'window_size': [self.width(), self.height()],
                 'window_position': [self.x(), self.y()]
+            }
+            with open('settings.json', 'w', encoding='utf-8') as f:
+                json.dump(settings, f, indent=2)
+            self.statusBar().showMessage("Impostazioni salvate", 2000)
+        except Exception as e:
+            self.statusBar().showMessage(f"Errore nel salvataggio delle impostazioni: {str(e)}")
+
+    def closeEvent(self, event):
+        """Evento chiamato alla chiusura della finestra"""
+        # Salva le impostazioni prima di chiudere
+        self.save_settings()
+        super().closeEvent(event)

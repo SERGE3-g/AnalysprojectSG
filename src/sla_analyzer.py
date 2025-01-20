@@ -11,6 +11,9 @@ from docx.enum.style import WD_STYLE_TYPE
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
+# Per chi volesse usare la lettura chunk in futuro:
+# from pandas import read_csv
+
 
 class SLATab(ttk.Frame):
     def __init__(self, parent, current_user, user_role):
@@ -19,7 +22,6 @@ class SLATab(ttk.Frame):
         self.current_user = current_user
         self.user_role = user_role
 
-        # Per evitare errori prima della creazione di log_text
         self.log_text = None
 
         # Variabili per i file
@@ -232,7 +234,7 @@ class SLATab(ttk.Frame):
                         self.preview_tree.column(col, width=100)
 
                     # Inserisce i dati
-                    for idx, row in df.iterrows():
+                    for _, row in df.iterrows():
                         self.preview_tree.insert('', 'end', values=list(row))
 
                     self.log(f"Anteprima caricata per {file_key}", "success")
@@ -261,13 +263,10 @@ class SLATab(ttk.Frame):
 
             legend_items = []
             for sla_name, threshold in self.thresholds.items():
-                # Esempio di regola su come prendere i file: SLA2_OUT, SLA3_OUT -> file out,
-                # SLA4_IN, SLA5_IN, SLA6_IN -> file in
                 file_key = f"{sla_name}_OUT" if sla_name in ['SLA2', 'SLA3'] else f"{sla_name}_IN"
                 if self.files[file_key]['path']:
                     try:
                         df = pd.read_csv(self.files[file_key]['path'], sep=';')
-                        # Con dayfirst=True, interpretiamo '13/12/2024 00:00' come 13 dicembre
                         df['Time'] = pd.to_datetime(df['Time'], dayfirst=True)
                         df[sla_name] = pd.to_numeric(df[sla_name], errors='coerce')
 
@@ -365,10 +364,9 @@ class SLATab(ttk.Frame):
                 file_path = self.files[file_key]['path']
                 try:
                     df = pd.read_csv(file_path, sep=';')
-                    # dayfirst=True per date in stile 13/12/2024
                     df['Time'] = pd.to_datetime(df['Time'], dayfirst=True)
                     df.set_index('Time', inplace=True)
-                    self.log(f"Analisi {sla_name}...", "info")
+
                     results[sla_name] = self.analyze_sla_data(df, threshold, sla_name)
                 except Exception as e:
                     self.log(f"Errore nell'analisi di {sla_name}: {str(e)}", "error")
@@ -389,7 +387,7 @@ class SLATab(ttk.Frame):
             self.log(f"Errore nella generazione del report: {str(e)}", "error")
             messagebox.showerror("Errore", str(e))
 
-    def generate_docx_report(self, results, output_path):
+    def generate_docx_report(self, all_results, output_path):
         """Genera il report Word (.docx) finale."""
         try:
             doc = Document()
@@ -407,15 +405,12 @@ class SLATab(ttk.Frame):
                     continue
 
                 try:
-                    # Leggi il CSV correttamente
                     df = pd.read_csv(self.files[file_key]['path'], sep=';', index_col='Time')
-                    # dayfirst=True per date in stile 13/12/2024
                     df.index = pd.to_datetime(df.index, dayfirst=True)
                     results = self.analyze_sla_data(df, self.thresholds[sla_name], sla_name)
 
-                    # Titolo sezione
                     section_num = int(sla_name.replace('SLA', ''))
-                    heading = doc.add_heading(f'3.{section_num} Rilevazioni {sla_name}', level=2)
+                    doc.add_heading(f'3.{section_num} Rilevazioni {sla_name}', level=2)
                     doc.add_paragraph()
 
                     # Creazione tabella
@@ -429,7 +424,6 @@ class SLATab(ttk.Frame):
                         'Min con\nOperatività',
                         '%'
                     ]
-
                     for i, text in enumerate(headers):
                         cell = table.rows[0].cells[i]
                         cell.text = text
@@ -440,36 +434,34 @@ class SLATab(ttk.Frame):
 
                     # Dati giornalieri
                     daily_stats = results['daily_stats']
+                    sla_col = sla_name
                     for _, row in daily_stats.iterrows():
                         row_cells = table.add_row().cells
                         row_cells[0].text = row['Date'].strftime('%Y-%m-%d')
-                        row_cells[1].text = str(int(row[sla_name]))
+                        row_cells[1].text = str(int(row[sla_col]))
                         row_cells[2].text = str(int(row['Time']))
 
-                        # Calcolo percentuale
                         total_minutes = int(row['Time'])
-                        over_threshold = int(row[sla_name])
+                        over_threshold = int(row[sla_col])
                         compliance = (
                             (total_minutes - over_threshold) / total_minutes * 100
                         ) if total_minutes > 0 else 0
                         row_cells[3].text = f"{compliance:.2f}"
 
-                        # Centra il testo
                         for cell in row_cells:
                             cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-                    # Riga RILEVAZIONE (totali)
+                    # Riga RILEVAZIONE
                     row_cells = table.add_row().cells
                     row_cells[0].text = "RILEVAZIONE"
                     row_cells[1].text = str(results['total_over_threshold'])
                     row_cells[2].text = str(results['total_records'])
 
-                    # Calcolo percentuale totale
-                    total_compliance = ((results['total_records'] - results['total_over_threshold']) /
-                                        results['total_records'] * 100) if results['total_records'] > 0 else 0
+                    total_compliance = (
+                        (results['total_records'] - results['total_over_threshold']) / results['total_records'] * 100
+                    ) if results['total_records'] > 0 else 0
                     row_cells[3].text = f"{total_compliance:.2f}"
 
-                    # Formattazione riga totali
                     for cell in row_cells:
                         cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
                         for paragraph in cell.paragraphs:
@@ -478,8 +470,8 @@ class SLATab(ttk.Frame):
 
                     # Conclusioni
                     doc.add_paragraph()
-                    threshold = 95
-                    is_compliant = total_compliance >= threshold
+                    threshold_val = 95
+                    is_compliant = total_compliance >= threshold_val
 
                     p = doc.add_paragraph()
                     p.add_run("Il ").italic = True
@@ -492,7 +484,7 @@ class SLATab(ttk.Frame):
                     bold_perc.bold = True
                     p.add_run(").")
 
-                    doc.add_paragraph(f"Ciò considerato l'obiettivo previsto del {threshold}%.")
+                    doc.add_paragraph(f"Ciò considerato l'obiettivo previsto del {threshold_val}%.")
                     doc.add_paragraph()
 
                 except Exception as e:
@@ -526,126 +518,89 @@ class SLATab(ttk.Frame):
             bottom_element.set(qn('w:color'), bottom['color'].replace('#', ''))
             tcBorders.append(bottom_element)
 
-    def normalize_time_value(self, value):
-        """Converte una stringa di tempo (ms, s, min, mins, minute, minutes) in millisecondi float."""
+    def fast_normalize_time_value(self, value):
+        """
+        Converte una stringa di tempo in millisecondi (float).
+        Versione senza log a ogni riga, per maggiore velocità.
+        """
         import re
+        import numpy as np
+
+        if pd.isna(value):
+            return 0.0  # O np.nan, a scelta
+
+        v = str(value).strip().lower()
+
+        # 1) Se è già un numero (es. "1200" o "1200.5")
         try:
-            # Log del valore ricevuto
-            self.log(f"Tentativo di conversione del valore: '{value}'", "info")
+            return float(v)
+        except ValueError:
+            pass
 
-            value = str(value).strip()
+        # 2) millisecondi con "ms" (es. "647 ms")
+        if v.endswith('ms'):
+            numeric_str = v.replace('ms', '').strip()
+            return float(numeric_str)
 
-            # Se è già un numero
-            try:
-                return float(value)
-            except ValueError:
-                pass
+        # 3) secondi con "s" (es. "10s")
+        if re.match(r'^\d+(\.\d+)?\s*s$', v):
+            numeric_str = re.sub(r's$', '', v).strip()
+            return float(numeric_str) * 1000.0
 
-            # Gestiamo millisecondi (es. '647 ms')
-            if value.lower().endswith('ms'):
-                numeric_str = value.lower().replace('ms', '').strip()
-                result = float(numeric_str)
-                self.log(f"Convertito '{value}' in {result} ms", "info")
-                return result
+        # 4) minuti (es. "2 min", "2mins", "2minutes")
+        if re.search(r'(?:mins?|minutes?)$', v):
+            numeric_str = re.sub(r'(?:mins?|minutes?)$', '', v).strip()
+            return float(numeric_str) * 60000.0
 
-            # Gestiamo secondi (es. '10s', non 'ms')
-            elif re.match(r'^\d+(\.\d+)?\s*s$', value.lower()):
-                numeric_str = re.sub(r's$', '', value, flags=re.IGNORECASE).strip()
-                result = float(numeric_str) * 1000
-                self.log(f"Convertito '{value}' in {result} ms", "info")
-                return result
-
-            # Gestiamo minuti: min, mins, minute, minutes
-            elif re.search(r'(?:min|mins|minute|minutes)\s*$', value.lower()):
-                numeric_str = re.sub(r'(?:mins?|minutes?)\s*$', '', value, flags=re.IGNORECASE).strip()
-                self.log(f"Dopo la rimozione di 'min*': '{numeric_str}'", "info")
-                result = float(numeric_str) * 60 * 1000
-                self.log(f"Convertito '{value}' in {result} ms", "info")
-                return result
-
-            else:
-                self.log(f"Formato tempo non riconosciuto: '{value}'", "error")
-                raise ValueError(f"Formato tempo non riconosciuto: '{value}'")
-
-        except Exception as e:
-            self.log(f"Errore nella conversione del valore '{value}': {str(e)}", "error")
-            raise
+        # Se non riconosciuto, restituiamo 0.0 (o np.nan)
+        return 0.0
 
     def analyze_sla_data(self, df, threshold, sla_name):
-        """Analizza i dati SLA per produrre statistiche giornaliere."""
+        """
+        Analizza i dati SLA per produrre statistiche giornaliere in modo più veloce.
+        """
         try:
-            # Facciamo una copia del DataFrame
+            # Copia DF
             df = df.copy()
 
-            # Log dei primi valori della colonna SLA
-            self.log(f"Valori originali SLA ({sla_name}):\n{df[sla_name].head(10).to_string()}", "info")
-
-            # Se Time è nell'indice, lo resettiamo per averlo come colonna
+            # Se Time è nell'indice, lo resettiamo come colonna
             if df.index.name == 'Time':
                 df = df.reset_index()
 
-            # Verifichiamo se abbiamo le colonne necessarie
+            # Verifica colonne
             required_columns = ['Time', sla_name]
             for col in required_columns:
                 if col not in df.columns:
-                    raise KeyError(f"Colonna {col} non trovata nel DataFrame")
+                    raise KeyError(f"Colonna {col} non trovata nel DataFrame per {sla_name}")
 
-            # Convertiamo la colonna Time in datetime con dayfirst=True
-            try:
-                df['Time'] = pd.to_datetime(df['Time'], dayfirst=True)
-            except ValueError as e:
-                self.log(f"Errore nel parsing della data: {str(e)}", "error")
-                raise
+            # Conversione colonna Time in datetime
+            df['Time'] = pd.to_datetime(df['Time'], dayfirst=True, errors='coerce')
+            if df['Time'].isnull().any():
+                self.log(f"Attenzione: ci sono date non parse correttamente per {sla_name}.", "warning")
 
-            # Pulizia e conversione della colonna SLA
-            try:
-                # Convertiamo un valore alla volta per debug
-                converted_values = []
-                for idx, val in enumerate(df[sla_name]):
-                    try:
-                        converted_val = self.normalize_time_value(val)
-                        converted_values.append(converted_val)
-                    except Exception as e:
-                        self.log(f"Errore alla riga {idx} con valore '{val}': {str(e)}", "error")
-                        raise
+            # Conversione vettoriale della colonna SLA
+            df[sla_name] = df[sla_name].apply(self.fast_normalize_time_value)
 
-                # Assegnamo i valori convertiti
-                df[sla_name] = converted_values
-                self.log(f"Conversione completata. Primi valori convertiti:\n{df[sla_name].head().to_string()}", "info")
-
-            except Exception as e:
-                self.log(f"Errore nella conversione dei valori SLA: {str(e)}", "error")
-                # Log di alcuni valori per debug
-                self.log(f"Alcuni valori problematici di {sla_name}: {df[sla_name].head().tolist()}", "info")
-                raise
-
-            # Estraiamo la data
+            # Aggiunge colonna Date
             df['Date'] = df['Time'].dt.date
 
-            # Calcoliamo le statistiche giornaliere
-            daily_stats = df.groupby(df['Date']).agg({
-                sla_name: lambda x: sum(x > threshold),
+            # Calcolo statistiche giornaliere
+            daily_stats = df.groupby('Date').agg({
+                sla_name: lambda x: (x > threshold).sum(),
                 'Time': 'count'
             }).reset_index()
 
-            # Calcoliamo i totali
+            # Totali
             total_records = int(daily_stats['Time'].sum())
             total_over_threshold = int(daily_stats[sla_name].sum())
 
-            # Calcoliamo i dettagli delle non conformità
-            non_compliant_mask = df[sla_name] > threshold
-            non_compliant_df = df[non_compliant_mask].copy()
+            # Dettagli di non conformità (vettoriale)
+            non_compliant_df = df[df[sla_name] > threshold].copy()
+            non_compliant_df['deviation'] = non_compliant_df[sla_name] - threshold
+            non_compliant_details = non_compliant_df[['Time', sla_name, 'deviation']] \
+                .rename(columns={sla_name: 'value'}) \
+                .to_dict(orient='records')
 
-            non_compliant_details = []
-            for _, row in non_compliant_df.iterrows():
-                detail = {
-                    'timestamp': row['Time'].strftime('%Y-%m-%d %H:%M:%S'),
-                    'value': float(row[sla_name]),
-                    'deviation': float(row[sla_name] - threshold)
-                }
-                non_compliant_details.append(detail)
-
-            # Prepariamo il risultato
             results = {
                 'daily_stats': daily_stats,
                 'total_records': total_records,
@@ -654,22 +609,16 @@ class SLATab(ttk.Frame):
                 'threshold': threshold
             }
 
-            # Log per debug
-            self.log(f"Analisi completata per {sla_name}:", "info")
-            self.log(f"- Record totali: {total_records}", "info")
-            self.log(f"- Record oltre soglia: {total_over_threshold}", "info")
-
+            # Log finale di riepilogo
+            self.log(f"[{sla_name}] Totale record: {total_records}, Oltre soglia: {total_over_threshold}", "info")
             return results
 
         except Exception as e:
-            self.log(f"Errore dettagliato nell'analisi dei dati per {sla_name}: {str(e)}", "error")
-            self.log(f"Colonne presenti nel DataFrame: {list(df.columns)}", "info")
-            self.log(f"Prime righe del DataFrame:\n{df.head().to_string()}", "info")
+            self.log(f"Errore nell'analisi di {sla_name}: {str(e)}", "error")
             raise
 
     def format_table_row(self, row_cells, bold=False, center=True):
         """Formatta una riga della tabella con le impostazioni specificate."""
-        from docx.enum.text import WD_ALIGN_PARAGRAPH
         for cell in row_cells:
             if center:
                 cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -703,7 +652,6 @@ class SLATab(ttk.Frame):
 
     def initialize_docx_styles(self, doc):
         """Inizializza gli stili del documento Word."""
-        from docx.enum.style import WD_STYLE_TYPE
         style = doc.styles['Normal']
         style.font.name = 'Calibri'
         style.font.size = Pt(11)
@@ -719,7 +667,6 @@ class SLATab(ttk.Frame):
 
     def add_summary_section(self, doc, total_compliance):
         """Aggiunge la sezione di riepilogo al documento."""
-        from docx.enum.text import WD_ALIGN_PARAGRAPH
         doc.add_paragraph()
         summary = doc.add_heading('Riepilogo Generale', level=1)
         summary.style = doc.styles['Heading 1']
@@ -794,10 +741,21 @@ class SLATab(ttk.Frame):
         except Exception as e:
             self.log(f"Errore nella ricerca configurazioni SLA: {str(e)}", "error")
 
-        # Se non troviamo niente...
         if not results:
             results.append(("Info", f"Nessun risultato trovato per: {text}"))
 
         self.log(f"Ricerca eseguita per: {text} - Trovati {len(results)} risultati", "info")
 
         return results
+
+
+def main():
+    root = tk.Tk()
+    root.title("SLA Analysis")
+    app = SLATab(root, current_user="Utente", user_role="admin")
+    app.pack(fill='both', expand=True)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import sys
 import logging
 from PyQt5.QtWidgets import QApplication

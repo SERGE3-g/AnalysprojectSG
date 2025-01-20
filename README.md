@@ -69,7 +69,7 @@ pyinstaller --onefile --windowed main.py
 
 ### Linux/Mac
 ```bash
-pyinstaller --onefile --windowed main.py
+pyinstaller --onefile --windowed mainG.py
 ```
 
 ## Docker Support
