@@ -5,3 +5,20 @@ reportlab==4.0.4
 Pillow==10.0.0
 python-dateutil==2.8.2
 sqlite3worker==1.1.7
+
+# For chatbot application
+
+PyQt5==5.15.7           # Libreria per creare interfacce grafiche
+pyqt5-tools==5.15.4.3.2 # Strumenti aggiuntivi per PyQt (Qt Designer)
+nltk==3.8.1             # Libreria per Natural Language Processing
+textblob==0.17.1        # Libreria per analisi del testo e correzione grammaticale
+spacy==3.6.0            # Libreria per analisi grammaticale avanzata
+openai==0.27.8          # Interfaccia per utilizzare i modelli GPT
+sympy==1.12             # Risoluzione di equazioni matematiche
+sqlalchemy==2.1.1       # Libreria per interagire con i database SQL
+psycopg2==2.9.7         # Driver per PostgreSQL
+cx_Oracle==8.3.0        # Driver per Oracle Database
+lxml==4.9.3             # Parsing avanzato di XML
+pandas==2.1.0           # Per gestire ed esportare dati in formato tabellare
+pytest==7.5.0           # Framework per eseguire test automatizzati
+requests==2.31.0        # Libreria per effettuare richieste HTTP

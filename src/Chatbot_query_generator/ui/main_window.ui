@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Chatbot Query Generator</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTextEdit" name="inputTextBox">
+      <property name="placeholderText">
+       <string>Inserisci qui il tuo input...</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="databaseComboBox">
+      <item>
+       <property name="text">
+        <string>PostgreSQL</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Oracle</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SQL</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="generateQueryButton">
+      <property name="text">
+       <string>Genera Query</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="queryTextBox">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="loadFileButton">
+      <property name="text">
+       <string>Carica File</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="fileDetailsTextBox">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+
