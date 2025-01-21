@@ -1366,3 +1366,24 @@
 2025-01-21 07:55:20,032 - INFO - Inizializzazione sistema completata
 2025-01-21 07:55:40,748 - INFO - Login riuscito - Utente: admin, Ruolo: admin
 2025-01-21 08:07:14,543 - INFO - Applicazione chiusa dall'utente admin
+2025-01-21 10:53:34,457 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-21 10:53:34,458 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-21 10:53:34,458 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-21 10:53:40,316 - INFO - === Avvio Applicazione ===
+2025-01-21 10:53:40,316 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-21 10:53:40,317 - INFO - Sistema operativo: nt
+2025-01-21 10:53:40,317 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-21 10:53:40,318 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-21 10:53:40,318 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-21 10:53:40,319 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-21 10:53:40,319 - INFO - Database non trovato. Inizializzazione...
+2025-01-21 10:53:40,320 - INFO - Inizializzazione del database...
+2025-01-21 10:53:40,324 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-21 10:53:40,350 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-21 10:53:40,359 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-21 10:53:40,370 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-21 10:53:40,373 - INFO - Utente admin creato (se non già presente).
+2025-01-21 10:53:40,381 - INFO - Database inizializzato con successo!
+2025-01-21 10:53:40,382 - INFO - Inizializzazione sistema completata
+2025-01-21 16:01:29,925 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-21 17:49:23,429 - INFO - Applicazione chiusa dall'utente admin
