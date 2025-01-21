@@ -22,3 +22,17 @@ lxml==4.9.3             # Parsing avanzato di XML
 pandas==2.1.0           # Per gestire ed esportare dati in formato tabellare
 pytest==7.5.0           # Framework per eseguire test automatizzati
 requests==2.31.0        # Libreria per effettuare richieste HTTP
+
+# sudo -H pip install scikit-learn
+# sudo pip install --no-cache-dir scikit-learn
+# pip install --upgrade transformers
+# pip install torch torchvision torchaudio
+# pip install tensorflow
+# pip install transformers
+# pip install flax --> https://github.com/google/flax --> cosa fa?
+
+#python -m venv .venv
+#source .venv/bin/activate   # Per Windows usa .venv\Scripts\activate
+#pip install --upgrade pip
+#pip install transformers torch
+

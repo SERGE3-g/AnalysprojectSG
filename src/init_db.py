@@ -114,10 +114,10 @@ def initialize_database():
         ) VALUES (
             'admin',
             ?,
-            'gueaserge@gmail.com',
+            'gueaserge2@gmail.com',
             'admin',
-            'Admin',
-            'User'
+            'Serge',
+            'Guea'
         )
         ''', (admin_password,))
         logging.info("Utente admin creato (se non già presente).")
