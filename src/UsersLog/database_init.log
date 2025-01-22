@@ -1813,3 +1813,23 @@
 2025-01-22 02:18:43,009 - INFO - Login riuscito - Utente: admin, Ruolo: admin
 2025-01-22 02:18:43,046 - ERROR - Errore creazione tab: 'SLATab' object has no attribute 'configure_logging'
 2025-01-22 02:18:48,141 - ERROR - Errore creazione finestra principale: 'SLATab' object has no attribute 'configure_logging'
+2025-01-22 12:04:18,378 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-22 12:04:18,379 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-22 12:04:18,379 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-22 12:04:23,195 - INFO - === Avvio Applicazione ===
+2025-01-22 12:04:23,195 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-22 12:04:23,195 - INFO - Sistema operativo: nt
+2025-01-22 12:04:23,195 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-22 12:04:23,196 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-22 12:04:23,197 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-22 12:04:23,197 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-22 12:04:23,198 - INFO - Database non trovato. Inizializzazione...
+2025-01-22 12:04:23,198 - INFO - Inizializzazione del database...
+2025-01-22 12:04:23,200 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-22 12:04:23,216 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-22 12:04:23,225 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-22 12:04:23,234 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-22 12:04:23,238 - INFO - Utente admin creato (se non già presente).
+2025-01-22 12:04:23,245 - INFO - Database inizializzato con successo!
+2025-01-22 12:04:23,246 - INFO - Inizializzazione sistema completata
+2025-01-22 12:10:13,389 - INFO - Login riuscito - Utente: admin, Ruolo: admin
