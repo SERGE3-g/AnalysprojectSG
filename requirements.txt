@@ -1,38 +1,84 @@
-pandas==2.1.0
+aiohappyeyeballs==2.4.4
+aiohttp==3.11.11
+aiosignal==1.3.2
+app==0.0.1
+attrs==24.3.0
+certifi==2024.12.14
+cffi==1.17.1
+chardet==5.2.0
+charset-normalizer==3.4.1
+click==8.1.8
+colorama==0.4.6
+contourpy==1.3.1
+cx_Freeze==7.2.8
+cx_Logging==3.2.1
+cx_Oracle==8.3.0
+cycler==0.12.1
+decorator==5.1.1
+et_xmlfile==2.0.0
+ExifRead==3.0.0
+filelock==3.16.1
+fonttools==4.55.3
+frozenlist==1.5.0
+fsspec==2024.12.0
+huggingface-hub==0.27.1
+idna==3.10
+imageio==2.37.0
+imageio-ffmpeg==0.6.0
+joblib==1.4.2
+kiwisolver==1.4.8
+langdetect==1.0.9
+lief==0.16.2
+lxml==5.3.0
+matplotlib==3.10.0
+moviepy==2.1.2
+mpmath==1.3.0
+multidict==6.1.0
+nltk==3.8.1
+numpy==2.2.1
+openai==0.27.8
 openpyxl==3.1.2
-qrcode==7.4.2
-reportlab==4.0.4
-Pillow==10.0.0
+packaging==24.2
+pandas==2.2.3
+pdf2image==1.17.0
+pillow==10.4.0
+proglog==0.1.10
+propcache==0.2.1
+pycparser==2.22
+pydub==0.25.1
+pyparsing==3.2.1
+PyPDF2==3.0.1
+pypng==0.20220715.0
+PyQt5==5.15.7
+PyQt5-Qt5==5.15.2
+PyQt5-stubs==5.15.6.0
+PyQt5_sip==12.16.1
+pytesseract==0.3.13
 python-dateutil==2.8.2
-sqlite3worker==1.1.7
-
-# For chatbot application
-
-PyQt5==5.15.7           # Libreria per creare interfacce grafiche
-pyqt5-tools==5.15.4.3.2 # Strumenti aggiuntivi per PyQt (Qt Designer)
-nltk==3.8.1             # Libreria per Natural Language Processing
-textblob==0.17.1        # Libreria per analisi del testo e correzione grammaticale
-spacy==3.6.0            # Libreria per analisi grammaticale avanzata
-openai==0.27.8          # Interfaccia per utilizzare i modelli GPT
-sympy==1.12             # Risoluzione di equazioni matematiche
-sqlalchemy==2.1.1       # Libreria per interagire con i database SQL
-psycopg2==2.9.7         # Driver per PostgreSQL
-cx_Oracle==8.3.0        # Driver per Oracle Database
-lxml==4.9.3             # Parsing avanzato di XML
-pandas==2.1.0           # Per gestire ed esportare dati in formato tabellare
-pytest==7.5.0           # Framework per eseguire test automatizzati
-requests==2.31.0        # Libreria per effettuare richieste HTTP
-
-# sudo -H pip install scikit-learn
-# sudo pip install --no-cache-dir scikit-learn
-# pip install --upgrade transformers
-# pip install torch torchvision torchaudio
-# pip install tensorflow
-# pip install transformers
-# pip install flax --> https://github.com/google/flax --> cosa fa?
-
-#python -m venv .venv
-#source .venv/bin/activate   # Per Windows usa .venv\Scripts\activate
-#pip install --upgrade pip
-#pip install transformers torch
-
+python-docx==1.1.2
+python-dotenv==1.0.1
+pytz==2024.2
+PyYAML==6.0.2
+qrcode==7.4.2
+regex==2024.11.6
+reportlab==4.2.5
+requests==2.31.0
+safetensors==0.5.2
+scikit-learn==1.6.1
+scipy==1.15.1
+seaborn==0.13.2
+self==2020.12.3
+setuptools==75.8.0
+six==1.17.0
+soundfile==0.13.0
+sympy==1.12
+tabula==1.0.5
+textblob==0.17.1
+threadpoolctl==3.5.0
+tokenizers==0.21.0
+tqdm==4.67.1
+transformers==4.48.1
+typing_extensions==4.12.2
+tzdata==2024.2
+urllib3==2.3.0
+yarl==1.18.3

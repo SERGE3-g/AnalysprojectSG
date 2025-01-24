@@ -1833,3 +1833,86 @@
 2025-01-22 12:04:23,245 - INFO - Database inizializzato con successo!
 2025-01-22 12:04:23,246 - INFO - Inizializzazione sistema completata
 2025-01-22 12:10:13,389 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-23 14:16:11,593 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-23 14:16:11,594 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-23 14:16:11,594 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-23 14:16:16,833 - INFO - === Avvio Applicazione ===
+2025-01-23 14:16:16,834 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-23 14:16:16,834 - INFO - Sistema operativo: nt
+2025-01-23 14:16:16,834 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-23 14:16:16,835 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-23 14:16:16,835 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-23 14:16:16,836 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-23 14:16:16,837 - INFO - Database non trovato. Inizializzazione...
+2025-01-23 14:16:16,837 - INFO - Inizializzazione del database...
+2025-01-23 14:16:16,839 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-23 14:16:16,854 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-23 14:16:16,863 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-23 14:16:16,872 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-23 14:16:16,875 - INFO - Utente admin creato (se non già presente).
+2025-01-23 14:16:16,883 - INFO - Database inizializzato con successo!
+2025-01-23 14:16:16,884 - INFO - Inizializzazione sistema completata
+2025-01-23 14:16:45,993 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-24 12:26:25,209 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-24 12:26:25,210 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-24 12:26:25,210 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-24 12:26:30,893 - INFO - === Avvio Applicazione ===
+2025-01-24 12:26:30,893 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-24 12:26:30,893 - INFO - Sistema operativo: nt
+2025-01-24 12:26:30,893 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-24 12:26:30,894 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-24 12:26:30,895 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-24 12:26:30,895 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-24 12:26:30,896 - INFO - Database non trovato. Inizializzazione...
+2025-01-24 12:26:30,896 - INFO - Inizializzazione del database...
+2025-01-24 12:26:30,898 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-24 12:26:30,913 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-24 12:26:30,922 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-24 12:26:30,931 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-24 12:26:30,935 - INFO - Utente admin creato (se non già presente).
+2025-01-24 12:26:30,942 - INFO - Database inizializzato con successo!
+2025-01-24 12:26:30,943 - INFO - Inizializzazione sistema completata
+2025-01-24 12:27:19,998 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-24 12:34:01,769 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-24 12:34:01,769 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-24 12:34:01,770 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-24 12:34:05,409 - INFO - === Avvio Applicazione ===
+2025-01-24 12:34:05,409 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-24 12:34:05,409 - INFO - Sistema operativo: nt
+2025-01-24 12:34:05,409 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-24 12:34:05,411 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-24 12:34:05,411 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-24 12:34:05,411 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-24 12:34:05,412 - INFO - Database non trovato. Inizializzazione...
+2025-01-24 12:34:05,412 - INFO - Inizializzazione del database...
+2025-01-24 12:34:05,414 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-24 12:34:05,436 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-24 12:34:05,448 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-24 12:34:05,463 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-24 12:34:05,467 - INFO - Utente admin creato (se non già presente).
+2025-01-24 12:34:05,476 - INFO - Database inizializzato con successo!
+2025-01-24 12:34:05,477 - INFO - Inizializzazione sistema completata
+2025-01-24 12:34:32,992 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-24 12:36:01,191 - INFO - Impostazioni salvate - Tema: Scuro
+2025-01-24 12:44:59,776 - INFO - Applicazione chiusa dall'utente admin
+2025-01-24 15:17:41,415 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-24 15:17:41,416 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-24 15:17:41,416 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-24 15:17:45,084 - INFO - === Avvio Applicazione ===
+2025-01-24 15:17:45,084 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-24 15:17:45,085 - INFO - Sistema operativo: nt
+2025-01-24 15:17:45,085 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-24 15:17:45,086 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-24 15:17:45,087 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-24 15:17:45,087 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-24 15:17:45,088 - INFO - Database non trovato. Inizializzazione...
+2025-01-24 15:17:45,088 - INFO - Inizializzazione del database...
+2025-01-24 15:17:45,090 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-24 15:17:45,114 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-24 15:17:45,124 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-24 15:17:45,137 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-24 15:17:45,141 - INFO - Utente admin creato (se non già presente).
+2025-01-24 15:17:45,149 - INFO - Database inizializzato con successo!
+2025-01-24 15:17:45,150 - INFO - Inizializzazione sistema completata
+2025-01-24 15:18:43,883 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-24 17:47:25,599 - INFO - Applicazione chiusa dall'utente admin
