@@ -1,7 +1,11 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import re
-from src.login_manager import LoginManager
+# da
+#from src.login_manager import LoginManager
+# a
+from login_manager import LoginManager
+#from src.login_manager import LoginManager
 
 
 class RegistrationWindow:

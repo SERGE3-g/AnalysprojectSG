@@ -117,7 +117,7 @@ class MainApp:
         """Crea la finestra principale dell'applicazione."""
         try:
             self.root = tk.Tk()
-            self.root.title(f"Business Intelligence Suite - v{self.VERSION}")
+            self.root.title(f"Business Intelligence Suite SG- v{self.VERSION}")
             self.root.geometry("1024x768")
             self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 

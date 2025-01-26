@@ -1833,3 +1833,22 @@
 2025-01-22 12:04:23,245 - INFO - Database inizializzato con successo!
 2025-01-22 12:04:23,246 - INFO - Inizializzazione sistema completata
 2025-01-22 12:10:13,389 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-22 23:05:16,309 - INFO - Directory base del progetto (src): /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-22 23:05:16,309 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data
+2025-01-22 23:05:16,309 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data/users.db
+2025-01-22 23:05:16,674 - INFO - === Avvio Applicazione ===
+2025-01-22 23:05:16,674 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-22 23:05:16,674 - INFO - Sistema operativo: posix
+2025-01-22 23:05:16,674 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-22 23:05:16,674 - INFO - Directory base: /Users/sergeguea/PycharmProjects/AnalysprojectSG
+2025-01-22 23:05:16,674 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data
+2025-01-22 23:05:16,674 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/data/users.db
+2025-01-22 23:05:16,674 - INFO - Database non trovato. Inizializzazione...
+2025-01-22 23:05:16,674 - INFO - Inizializzazione del database...
+2025-01-22 23:05:16,674 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-22 23:05:16,675 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-22 23:05:16,675 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-22 23:05:16,676 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-22 23:05:16,676 - INFO - Utente admin creato (se non già presente).
+2025-01-22 23:05:16,676 - INFO - Database inizializzato con successo!
+2025-01-22 23:05:16,676 - INFO - Inizializzazione sistema completata
