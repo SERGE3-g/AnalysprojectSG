@@ -1,24 +1,25 @@
-import sqlite3
 import hashlib
 import os
-import requests
 import socket
+import sqlite3
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
-import random
-import string
+
+import requests
+from setuptools import logging
+
 
 class LoginManager:
     def __init__(self):
-        # Percorso del DB (path assoluto)
-        self.db_path = os.path.abspath('data/users.db')
+        self.base_dir = Path(__file__).resolve().parent
+        self.data_dir = self.base_dir / 'data'
+        self.db_path = self.data_dir / 'users.db'
+
+        # Crea directory data se non esiste
+        self.data_dir.mkdir(exist_ok=True)
+
         print(f"[DEBUG] LoginManager DB path: {self.db_path}")
-
-        # Crea la cartella data se non esiste
-        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-
-        # Imposta il DB
         self.setup_database()
 
     def setup_database(self):
@@ -30,11 +31,11 @@ class LoginManager:
         else:
             print("[DEBUG] Database già presente. Controllo struttura...")
 
-        # Controlliamo se la tabella 'users' ha le colonne che ci servono
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
 
+            # Controllo struttura
             cursor.execute("PRAGMA table_info(users)")
             columns = cursor.fetchall()
             column_names = [col[1] for col in columns]
@@ -43,6 +44,11 @@ class LoginManager:
             if 'first_name' not in column_names or 'last_name' not in column_names:
                 print("[ERRORE] La tabella 'users' non ha le colonne 'first_name'/'last_name'.")
                 print("         Assicurati che init_db.py abbia creato la tabella correttamente.")
+
+            # Controllo utenti esistenti
+            cursor.execute("SELECT username, email, role FROM users")
+            users = cursor.fetchall()
+            print(f"[DEBUG] Utenti nel database: {users}")
 
         except sqlite3.Error as e:
             print(f"[ERRORE] Errore database in setup_database: {e}")
@@ -83,6 +89,10 @@ class LoginManager:
 
     def verify_login(self, username, password):
         """Verifica credenziali e stato attivo."""
+        if not username or not password:
+            logging.warning("Tentativo di login con credenziali vuote")
+            return None
+
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
@@ -123,11 +133,12 @@ class LoginManager:
                 return None
 
         except sqlite3.Error as e:
-            print(f"Errore database: {e}")
+            logging.error(f"Errore database: {e}")
             return None
         finally:
             if 'conn' in locals():
                 conn.close()
+
 
     def register_user(self, username, password, email, first_name, last_name):
         """Registra un nuovo utente."""
@@ -247,30 +258,31 @@ class LoginManager:
             if 'conn' in locals():
                 conn.close()
 
-    def reset_forgotten_password(self, email, new_password):
-        """
-        Reset password senza conoscere quella precedente,
-        identificando l'utente per email.
-        """
+    def request_password_reset(self, email):
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
 
-            # Verifica se esiste utente con questa email
-            cursor.execute('SELECT id FROM users WHERE email=?', (email,))
+            cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
             user = cursor.fetchone()
+
             if not user:
-                return False, f"Nessun utente con email: {email}"
+                return False, "Email non trovata"
 
-            user_id = user[0]
-            hashed_new = self.hash_password(new_password)
-            cursor.execute('UPDATE users SET password=? WHERE id=?', (hashed_new, user_id))
+            token = hashlib.sha256(os.urandom(32)).hexdigest()[:32]
+            expiry = datetime.now() + timedelta(hours=24)
+
+            cursor.execute('''
+                UPDATE users 
+                SET reset_token = ?, reset_token_expiry = ? 
+                WHERE email = ?
+            ''', (token, expiry, email))
+
             conn.commit()
-
-            return True, f"Password reimpostata con successo per l'email {email}"
+            return True, token
 
         except sqlite3.Error as e:
-            return False, f"Errore durante reset password: {str(e)}"
+            return False, f"Errore database: {str(e)}"
         finally:
             if 'conn' in locals():
                 conn.close()

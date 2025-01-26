@@ -1916,3 +1916,352 @@
 2025-01-24 15:17:45,150 - INFO - Inizializzazione sistema completata
 2025-01-24 15:18:43,883 - INFO - Login riuscito - Utente: admin, Ruolo: admin
 2025-01-24 17:47:25,599 - INFO - Applicazione chiusa dall'utente admin
+2025-01-25 18:39:07,298 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 18:39:07,299 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 18:39:07,299 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 18:42:44,969 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 18:42:44,970 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 18:42:44,970 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 18:46:28,076 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 18:46:28,077 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 18:46:28,077 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 18:50:42,416 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 18:50:42,417 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 18:50:42,417 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 18:56:22,416 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 18:56:22,417 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 18:56:22,417 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 18:56:26,816 - INFO - generated new fontManager
+2025-01-25 18:57:44,020 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 18:57:44,021 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 18:57:44,021 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 19:02:36,034 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:02:36,035 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 19:02:36,035 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 19:07:52,317 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:07:52,318 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 19:07:52,318 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 19:07:53,720 - INFO - === Avvio Applicazione ===
+2025-01-25 19:07:53,720 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 19:07:53,720 - INFO - Sistema operativo: nt
+2025-01-25 19:07:53,721 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:07:53,721 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 19:07:53,721 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 19:07:53,722 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 19:07:53,722 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 19:07:53,722 - INFO - Inizializzazione del database...
+2025-01-25 19:07:53,723 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-25 19:07:53,754 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-25 19:07:53,762 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-25 19:07:53,780 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-25 19:07:53,783 - INFO - Utente admin creato (se non già presente).
+2025-01-25 19:07:53,788 - INFO - Database inizializzato con successo!
+2025-01-25 19:07:53,789 - INFO - Inizializzazione sistema completata
+2025-01-25 19:08:34,754 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-25 19:24:05,944 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:24:05,944 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 19:24:05,944 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 19:24:07,452 - INFO - === Avvio Applicazione ===
+2025-01-25 19:24:07,452 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 19:24:07,452 - INFO - Sistema operativo: nt
+2025-01-25 19:24:07,452 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:24:07,453 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 19:24:07,453 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 19:24:07,453 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 19:24:07,454 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 19:24:07,454 - INFO - Inizializzazione del database...
+2025-01-25 19:24:07,455 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-25 19:24:07,466 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-25 19:24:07,473 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-25 19:24:07,479 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-25 19:24:07,481 - INFO - Utente admin creato (se non già presente).
+2025-01-25 19:24:07,486 - INFO - Database inizializzato con successo!
+2025-01-25 19:24:07,486 - INFO - Inizializzazione sistema completata
+2025-01-25 19:24:07,702 - ERROR - Errore durante il login: 'LoginManager' object has no attribute 'db_path'
+2025-01-25 19:26:34,501 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:26:34,502 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 19:26:34,502 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 19:26:36,622 - INFO - === Avvio Applicazione ===
+2025-01-25 19:26:36,623 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 19:26:36,623 - INFO - Sistema operativo: nt
+2025-01-25 19:26:36,623 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:26:36,624 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 19:26:36,624 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 19:26:36,625 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 19:26:36,625 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 19:26:36,625 - INFO - Inizializzazione del database...
+2025-01-25 19:26:36,626 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-25 19:26:36,641 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-25 19:26:36,657 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-25 19:26:36,670 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-25 19:26:36,673 - INFO - Utente admin creato (se non già presente).
+2025-01-25 19:26:36,681 - INFO - Database inizializzato con successo!
+2025-01-25 19:26:36,682 - INFO - Inizializzazione sistema completata
+2025-01-25 19:28:47,969 - INFO - Login riuscito - Utente: SergeG, Ruolo: user
+2025-01-25 19:29:32,093 - INFO - Impostazioni salvate - Tema: Sistema
+2025-01-25 19:30:06,491 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-25 19:30:06,492 - ERROR - Errore post-login: can't invoke "destroy" command: application has been destroyed
+2025-01-25 19:37:06,323 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:37:06,323 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 19:37:06,324 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 19:37:07,694 - INFO - === Avvio Applicazione ===
+2025-01-25 19:37:07,694 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 19:37:07,695 - INFO - Sistema operativo: nt
+2025-01-25 19:37:07,695 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:37:07,695 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 19:37:07,696 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 19:37:07,696 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 19:37:07,696 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 19:37:07,696 - INFO - Inizializzazione del database...
+2025-01-25 19:37:07,697 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-25 19:37:07,709 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-25 19:37:07,716 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-25 19:37:07,723 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-25 19:37:07,725 - INFO - Utente admin creato (se non già presente).
+2025-01-25 19:37:07,729 - INFO - Database inizializzato con successo!
+2025-01-25 19:37:07,730 - INFO - Inizializzazione sistema completata
+2025-01-25 19:48:57,429 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:48:57,429 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 19:48:57,429 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 19:49:02,034 - INFO - === Avvio Applicazione ===
+2025-01-25 19:49:02,037 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 19:49:02,038 - INFO - Sistema operativo: nt
+2025-01-25 19:49:02,039 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:49:02,043 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 19:49:02,043 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 19:49:02,044 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 19:49:02,044 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 19:49:02,044 - INFO - Inizializzazione del database...
+2025-01-25 19:49:02,046 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-25 19:49:02,095 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-25 19:49:02,110 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-25 19:49:02,119 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-25 19:49:02,126 - INFO - Utente admin creato (se non già presente).
+2025-01-25 19:49:02,133 - INFO - Database inizializzato con successo!
+2025-01-25 19:49:02,135 - INFO - Inizializzazione sistema completata
+2025-01-25 19:51:44,157 - INFO - Login riuscito - Utente: SergeG, Ruolo: user
+2025-01-25 19:52:00,364 - INFO - Logout effettuato con successo
+2025-01-25 19:52:00,365 - ERROR - Errore generico: 'MainApp' object has no attribute 'show_login'
+2025-01-25 19:56:20,112 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:56:20,112 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 19:56:20,112 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 19:56:21,478 - INFO - === Avvio Applicazione ===
+2025-01-25 19:56:21,478 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 19:56:21,478 - INFO - Sistema operativo: nt
+2025-01-25 19:56:21,479 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 19:56:21,479 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 19:56:21,479 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 19:56:21,479 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 19:56:21,480 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 19:56:21,480 - INFO - Inizializzazione del database...
+2025-01-25 19:56:21,481 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-25 19:56:21,491 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-25 19:56:21,499 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-25 19:56:21,507 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-25 19:56:21,509 - INFO - Utente admin creato (se non già presente).
+2025-01-25 19:56:21,513 - INFO - Database inizializzato con successo!
+2025-01-25 19:56:21,513 - INFO - Inizializzazione sistema completata
+2025-01-25 19:57:13,017 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-25 19:58:42,981 - ERROR - Errore durante il logout: 'MainApp' object has no attribute 'on_successful_login'
+2025-01-25 19:58:59,356 - ERROR - Errore durante il logout: 'MainApp' object has no attribute 'on_successful_login'
+2025-01-25 20:03:50,595 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:03:50,596 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 20:03:50,596 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 20:03:52,069 - INFO - === Avvio Applicazione ===
+2025-01-25 20:03:52,069 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 20:03:52,069 - INFO - Sistema operativo: nt
+2025-01-25 20:03:52,069 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:03:52,070 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 20:03:52,070 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 20:03:52,071 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 20:03:52,071 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 20:03:52,071 - INFO - Inizializzazione del database...
+2025-01-25 20:03:52,072 - INFO - Database esistente eliminato (reinizializzazione forzata)
+2025-01-25 20:03:52,080 - INFO - Tabella 'users' creata (o già esistente).
+2025-01-25 20:03:52,088 - INFO - Tabella 'access_logs' creata (o già esistente).
+2025-01-25 20:03:52,093 - INFO - Tabella 'user_settings' creata (o già esistente).
+2025-01-25 20:03:52,095 - INFO - Utente admin creato (se non già presente).
+2025-01-25 20:03:52,101 - INFO - Database inizializzato con successo!
+2025-01-25 20:03:52,101 - INFO - Inizializzazione sistema completata
+2025-01-25 20:04:08,930 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-25 20:09:47,118 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:09:47,119 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 20:09:47,119 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 20:09:48,475 - INFO - === Avvio Applicazione ===
+2025-01-25 20:09:48,475 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 20:09:48,476 - INFO - Sistema operativo: nt
+2025-01-25 20:09:48,476 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:09:48,476 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 20:09:48,476 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 20:09:48,477 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 20:09:48,477 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 20:09:48,477 - INFO - Inizializzazione del database...
+2025-01-25 20:09:48,478 - ERROR - Errore nell'eliminazione del database esistente: [WinError 32] Impossibile accedere al file. Il file è utilizzato da un altro processo: 'C:\\Users\\gueas\\PycharmProjects\\AnalysprojectSG\\src\\data\\users.db'
+2025-01-25 20:09:48,478 - ERROR - Errore inizializzazione sistema: Errore nell'inizializzazione del database
+2025-01-25 20:09:48,478 - ERROR - Errore di inizializzazione: Errore nell'inizializzazione del database
+2025-01-25 20:14:38,524 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:14:38,524 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 20:14:38,524 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 20:14:39,909 - INFO - === Avvio Applicazione ===
+2025-01-25 20:14:39,909 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 20:14:39,909 - INFO - Sistema operativo: nt
+2025-01-25 20:14:39,909 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:14:39,910 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 20:14:39,912 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 20:14:39,912 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 20:14:39,913 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 20:14:39,913 - INFO - Inizializzazione del database...
+2025-01-25 20:14:39,925 - INFO - Database inizializzato con successo!
+2025-01-25 20:14:39,925 - INFO - Inizializzazione sistema completata
+2025-01-25 20:15:23,956 - INFO - Login riuscito - Utente: SergeG, Ruolo: user
+2025-01-25 20:20:56,056 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:20:56,057 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 20:20:56,057 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 20:20:57,488 - INFO - === Avvio Applicazione ===
+2025-01-25 20:20:57,488 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 20:20:57,488 - INFO - Sistema operativo: nt
+2025-01-25 20:20:57,489 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:20:57,489 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 20:20:57,490 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 20:20:57,490 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 20:20:57,490 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 20:20:57,490 - INFO - Inizializzazione del database...
+2025-01-25 20:20:57,500 - INFO - Database inizializzato con successo!
+2025-01-25 20:20:57,501 - INFO - Inizializzazione sistema completata
+2025-01-25 20:22:00,027 - INFO - Login riuscito - Utente: SergeG, Ruolo: user
+2025-01-25 20:27:29,787 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:27:29,787 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 20:27:29,787 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 20:27:31,184 - INFO - === Avvio Applicazione ===
+2025-01-25 20:27:31,184 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 20:27:31,184 - INFO - Sistema operativo: nt
+2025-01-25 20:27:31,184 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:27:31,185 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 20:27:31,185 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 20:27:31,185 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 20:27:31,186 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 20:27:31,186 - INFO - Inizializzazione del database...
+2025-01-25 20:27:31,194 - INFO - Database inizializzato con successo!
+2025-01-25 20:27:31,194 - INFO - Inizializzazione sistema completata
+2025-01-25 20:31:36,830 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:31:36,831 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 20:31:36,831 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 20:31:38,481 - INFO - === Avvio Applicazione ===
+2025-01-25 20:31:38,482 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 20:31:38,482 - INFO - Sistema operativo: nt
+2025-01-25 20:31:38,482 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:31:38,482 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 20:31:38,483 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 20:31:38,483 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 20:31:38,483 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 20:31:38,483 - INFO - Inizializzazione del database...
+2025-01-25 20:31:38,491 - INFO - Database inizializzato con successo!
+2025-01-25 20:31:38,491 - INFO - Inizializzazione sistema completata
+2025-01-25 20:32:27,555 - INFO - Login riuscito - Utente: SergeG, Ruolo: user
+2025-01-25 20:38:47,115 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:38:47,116 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 20:38:47,116 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 20:38:48,438 - INFO - === Avvio Applicazione ===
+2025-01-25 20:38:48,439 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 20:38:48,439 - INFO - Sistema operativo: nt
+2025-01-25 20:38:48,439 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:38:48,440 - INFO - Directory base: C:\Users\gueas\PycharmProjects\AnalysprojectSG
+2025-01-25 20:38:48,440 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data
+2025-01-25 20:38:48,440 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\data\users.db
+2025-01-25 20:38:48,441 - INFO - Database non trovato. Inizializzazione...
+2025-01-25 20:38:48,441 - INFO - Inizializzazione del database...
+2025-01-25 20:38:48,450 - INFO - Database inizializzato con successo!
+2025-01-25 20:38:48,451 - INFO - Inizializzazione sistema completata
+2025-01-25 20:39:11,118 - INFO - Login riuscito per l'utente: SergeG
+2025-01-25 20:39:11,135 - INFO - Login riuscito - Utente: SergeG, Ruolo: user
+2025-01-25 20:40:51,646 - INFO - Applicazione chiusa dall'utente None
+2025-01-25 20:57:32,835 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:57:32,835 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 20:57:32,835 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 20:57:33,873 - INFO - === Avvio Applicazione ===
+2025-01-25 20:57:33,874 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 20:57:33,874 - INFO - Sistema operativo: nt
+2025-01-25 20:57:33,874 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 20:57:33,876 - INFO - Inizializzazione del database...
+2025-01-25 20:57:33,884 - INFO - Database inizializzato con successo!
+2025-01-25 20:57:33,884 - INFO - Sistema inizializzato
+2025-01-25 20:57:57,489 - INFO - Login riuscito per l'utente: SergeG
+2025-01-25 20:57:57,508 - INFO - Login riuscito - SergeG, user
+2025-01-25 20:57:57,777 - ERROR - Errore creazione finestra: 'MainApp' object has no attribute 'on_closing'
+2025-01-25 21:01:07,313 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:01:07,314 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 21:01:07,314 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 21:01:08,230 - INFO - === Avvio Applicazione ===
+2025-01-25 21:01:08,230 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 21:01:08,231 - INFO - Sistema operativo: nt
+2025-01-25 21:01:08,231 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:01:08,232 - INFO - Inizializzazione del database...
+2025-01-25 21:01:08,245 - INFO - Database inizializzato con successo!
+2025-01-25 21:01:08,246 - INFO - Sistema inizializzato
+2025-01-25 21:01:20,267 - INFO - Login riuscito per l'utente: SergeG
+2025-01-25 21:01:20,282 - INFO - Login riuscito - SergeG, user
+2025-01-25 21:01:20,607 - ERROR - Errore creazione finestra: 'MainApp' object has no attribute 'create_menu_bar'
+2025-01-25 21:03:23,097 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:03:23,097 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 21:03:23,098 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 21:03:24,161 - INFO - === Avvio Applicazione ===
+2025-01-25 21:03:24,161 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 21:03:24,161 - INFO - Sistema operativo: nt
+2025-01-25 21:03:24,162 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:03:24,163 - INFO - Inizializzazione del database...
+2025-01-25 21:03:24,171 - INFO - Database inizializzato con successo!
+2025-01-25 21:03:24,171 - INFO - Sistema inizializzato
+2025-01-25 21:03:51,333 - INFO - Login riuscito per l'utente: SergeG
+2025-01-25 21:03:51,352 - INFO - Login riuscito - SergeG, user
+2025-01-25 21:03:51,655 - ERROR - Errore creazione finestra: 'MainApp' object has no attribute 'create_tabs'
+2025-01-25 21:12:51,522 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:12:51,522 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 21:12:51,523 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 21:12:54,013 - INFO - === Avvio Applicazione ===
+2025-01-25 21:12:54,013 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 21:12:54,013 - INFO - Sistema operativo: nt
+2025-01-25 21:12:54,013 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:12:54,015 - INFO - Inizializzazione del database...
+2025-01-25 21:12:54,027 - INFO - Database inizializzato con successo!
+2025-01-25 21:12:54,028 - INFO - Sistema inizializzato
+2025-01-25 21:13:12,475 - INFO - Login riuscito per l'utente: SergeG
+2025-01-25 21:13:12,495 - INFO - Login riuscito - SergeG, user
+2025-01-25 21:13:12,883 - ERROR - Errore creazione finestra: 'MainApp' object has no attribute 'create_tabs'
+2025-01-25 21:13:39,677 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:13:39,677 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 21:13:39,678 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 21:13:42,467 - INFO - === Avvio Applicazione ===
+2025-01-25 21:13:42,467 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 21:13:42,467 - INFO - Sistema operativo: nt
+2025-01-25 21:13:42,467 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:13:42,468 - INFO - Inizializzazione del database...
+2025-01-25 21:13:42,480 - INFO - Database inizializzato con successo!
+2025-01-25 21:13:42,481 - INFO - Sistema inizializzato
+2025-01-25 21:14:19,234 - INFO - Login riuscito per l'utente: SergeG
+2025-01-25 21:14:19,255 - INFO - Login riuscito - SergeG, user
+2025-01-25 21:14:48,849 - INFO - Logout utente: SergeG
+2025-01-25 21:23:28,040 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:23:28,040 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 21:23:28,041 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 21:23:30,858 - INFO - === Avvio Applicazione ===
+2025-01-25 21:23:30,858 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 21:23:30,858 - INFO - Sistema operativo: nt
+2025-01-25 21:23:30,858 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:23:30,859 - INFO - Inizializzazione del database...
+2025-01-25 21:23:30,866 - INFO - Database inizializzato con successo!
+2025-01-25 21:23:30,867 - INFO - Sistema inizializzato
+2025-01-25 21:23:45,945 - INFO - Login riuscito per l'utente: SergeG
+2025-01-25 21:23:45,962 - INFO - Login riuscito - SergeG, user
+2025-01-25 21:24:28,206 - INFO - Logout utente: SergeG
+2025-01-25 21:32:07,293 - INFO - Directory base del progetto (src): C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:32:07,293 - INFO - Directory data: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data
+2025-01-25 21:32:07,293 - INFO - File database: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src\data\users.db
+2025-01-25 21:32:09,666 - INFO - === Avvio Applicazione ===
+2025-01-25 21:32:09,666 - INFO - Python versione: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
+2025-01-25 21:32:09,666 - INFO - Sistema operativo: nt
+2025-01-25 21:32:09,667 - INFO - Directory corrente: C:\Users\gueas\PycharmProjects\AnalysprojectSG\src
+2025-01-25 21:32:09,669 - INFO - Inizializzazione del database...
+2025-01-25 21:32:09,678 - INFO - Database inizializzato con successo!
+2025-01-25 21:32:09,679 - INFO - Sistema inizializzato correttamente.
+2025-01-25 21:32:43,580 - INFO - Login riuscito per l'utente: admin
+2025-01-25 21:32:43,598 - INFO - Login riuscito - Utente: admin, Ruolo: admin
