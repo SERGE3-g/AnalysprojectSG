@@ -46,16 +46,6 @@ def initialize_database():
     """Inizializza il database con la struttura necessaria."""
     logging.info("Inizializzazione del database...")
 
-    # Se vuoi sempre ricreare il database da zero, lo rimuoviamo se esiste
-    if DB_FILE.exists():
-        try:
-            DB_FILE.unlink()
-            logging.info("Database esistente eliminato (reinizializzazione forzata)")
-        except Exception as e:
-            logging.error(f"Errore nell'eliminazione del database esistente: {e}")
-            return False
-
-    # Connessione al database
     try:
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
@@ -77,7 +67,6 @@ def initialize_database():
             reset_token_expiry TIMESTAMP
         )
         ''')
-        logging.info("Tabella 'users' creata (o già esistente).")
 
         # Creazione tabella access_logs
         cursor.execute('''
@@ -91,7 +80,6 @@ def initialize_database():
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
         ''')
-        logging.info("Tabella 'access_logs' creata (o già esistente).")
 
         # Creazione tabella user_settings
         cursor.execute('''
@@ -104,9 +92,8 @@ def initialize_database():
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
         ''')
-        logging.info("Tabella 'user_settings' creata (o già esistente).")
 
-        # Crea utente admin di default (password "admin123")
+        # Crea admin di default se non esiste
         admin_password = hashlib.sha256('admin123'.encode()).hexdigest()
         cursor.execute('''
         INSERT OR IGNORE INTO users (
@@ -120,20 +107,15 @@ def initialize_database():
             'Guea'
         )
         ''', (admin_password,))
-        logging.info("Utente admin creato (se non già presente).")
 
-        # Commit delle modifiche
         conn.commit()
         logging.info("Database inizializzato con successo!")
         return True
 
-    except sqlite3.Error as e:
-        logging.error(f"Errore SQLite durante l'inizializzazione: {e}")
+    except Exception as e:
+        logging.error(f"Errore inizializzazione DB: {e}")
         if 'conn' in locals():
             conn.rollback()
-        return False
-    except Exception as e:
-        logging.error(f"Errore generico durante l'inizializzazione: {e}")
         return False
     finally:
         if 'conn' in locals():
