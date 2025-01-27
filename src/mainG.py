@@ -10,11 +10,11 @@ from typing import Optional, List
 # Import personal modules
 from init_db import initialize_database
 from login_window import LoginWindow
-from src.file_analyzer import FileTab
-from src.fiscal_analyzer import FiscalTab
-from src.inventory_manager import InventoryTab
-from src.sla_analyzer import SLATab
-from src.test_analyzer_tab import TestAnalyzerTab
+from file_analyzer import FileTab
+from fiscal_analyzer import FiscalTab
+from inventory_manager import InventoryTab
+from sla_analyzer import SLATab
+from test_analyzer_tab import TestAnalyzerTab
 from user_management import UserManagementWindow
 
 # Impostazioni di base e setup logging
