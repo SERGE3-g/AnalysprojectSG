@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 from registration_window import RegistrationWindow
-from src.login_manager import LoginManager
+from login_manager import LoginManager
 
 class LoginWindow:
     def __init__(self, on_login_success, db_path=None):
