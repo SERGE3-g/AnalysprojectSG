@@ -76,7 +76,7 @@ class MainApp:
         try:
             base_dir = Path(__file__).resolve().parent.parent
             data_dir = base_dir / 'data'
-            db_file = data_dir / 'users.db'
+            db_file = data_dir / 'new_users.db'
 
             data_dir.mkdir(exist_ok=True)
 

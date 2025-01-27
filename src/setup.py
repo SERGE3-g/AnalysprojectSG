@@ -3,7 +3,7 @@ import os
 
 # Inclusione di file e moduli personalizzati
 include_files = [
-    'data/users.db',                 # Database
+    'data/new_users.db',                 # Database
     'docs/manuale.pdf',              # Manuale PDF
     ('src/', 'src/'),                # Include la directory "src" con moduli personalizzati
     ('assets/', 'assets/'),          # Include la directory "assets" con immagini o file

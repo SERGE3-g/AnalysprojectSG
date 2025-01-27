@@ -1,4 +1,3 @@
-# user_management.py
 import hashlib
 import sqlite3
 import tkinter as tk

@@ -17,3 +17,69 @@
 2025-01-23 00:53:03,749 - INFO - Utente admin creato (se non già presente).
 2025-01-23 00:53:03,749 - INFO - Database inizializzato con successo!
 2025-01-23 00:53:03,749 - INFO - Inizializzazione sistema completata
+2025-01-26 20:05:29,111 - INFO - Directory base del progetto (src): /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 20:05:29,111 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data
+2025-01-26 20:05:29,111 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data/users.db
+2025-01-26 20:05:30,222 - INFO - === Avvio Applicazione ===
+2025-01-26 20:05:30,222 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-26 20:05:30,223 - INFO - Sistema operativo: posix
+2025-01-26 20:05:30,223 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 20:05:30,223 - INFO - Inizializzazione del database...
+2025-01-26 20:05:30,223 - ERROR - Errore inizializzazione DB: database disk image is malformed
+2025-01-26 20:05:30,223 - ERROR - Errore inizializzazione sistema: Errore inizializzazione database
+2025-01-26 20:05:30,223 - ERROR - Errore di inizializzazione: Errore inizializzazione database
+2025-01-26 20:15:09,573 - INFO - Directory base del progetto (src): /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 20:15:09,574 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data
+2025-01-26 20:15:09,574 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data/users.db
+2025-01-26 20:15:10,011 - INFO - === Avvio Applicazione ===
+2025-01-26 20:15:10,011 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-26 20:15:10,011 - INFO - Sistema operativo: posix
+2025-01-26 20:15:10,011 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 20:15:10,011 - INFO - Inizializzazione del database...
+2025-01-26 20:15:10,014 - ERROR - Errore inizializzazione DB: database disk image is malformed
+2025-01-26 20:15:10,014 - ERROR - Errore inizializzazione sistema: Errore inizializzazione database
+2025-01-26 20:15:10,014 - ERROR - Errore di inizializzazione: Errore inizializzazione database
+2025-01-26 20:15:47,008 - INFO - Directory base del progetto (src): /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 20:15:47,008 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data
+2025-01-26 20:15:47,008 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data/users.db
+2025-01-26 20:15:47,814 - INFO - === Avvio Applicazione ===
+2025-01-26 20:15:47,814 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-26 20:15:47,814 - INFO - Sistema operativo: posix
+2025-01-26 20:15:47,814 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 20:15:47,814 - INFO - Inizializzazione del database...
+2025-01-26 20:15:47,814 - ERROR - Errore inizializzazione DB: database disk image is malformed
+2025-01-26 20:15:47,814 - ERROR - Errore inizializzazione sistema: Errore inizializzazione database
+2025-01-26 20:15:47,814 - ERROR - Errore di inizializzazione: Errore inizializzazione database
+2025-01-26 20:34:42,513 - INFO - Directory base del progetto (src): /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 20:34:42,514 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data
+2025-01-26 20:34:42,514 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data/users.db
+2025-01-26 20:34:42,934 - INFO - === Avvio Applicazione ===
+2025-01-26 20:34:42,934 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-26 20:34:42,934 - INFO - Sistema operativo: posix
+2025-01-26 20:34:42,934 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 20:34:42,934 - INFO - Sistema inizializzato correttamente.
+2025-01-26 20:35:20,201 - ERROR - Errore durante il login: module 'setuptools.logging' has no attribute 'error'
+2025-01-26 20:46:06,295 - INFO - Directory base del progetto (src): /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 20:46:06,295 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data
+2025-01-26 20:46:06,295 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data/new_users.db
+2025-01-26 20:46:07,326 - INFO - === Avvio Applicazione ===
+2025-01-26 20:46:07,326 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-26 20:46:07,326 - INFO - Sistema operativo: posix
+2025-01-26 20:46:07,326 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 20:46:07,326 - INFO - Inizializzazione del database...
+2025-01-26 20:46:07,333 - INFO - Database inizializzato con successo!
+2025-01-26 20:46:07,333 - INFO - Sistema inizializzato correttamente.
+2025-01-26 20:46:42,507 - INFO - Login riuscito per l'utente: admin
+2025-01-26 20:46:42,514 - INFO - Login riuscito - Utente: admin, Ruolo: admin
+2025-01-26 21:00:20,807 - INFO - Directory base del progetto (src): /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 21:00:20,807 - INFO - Directory data: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data
+2025-01-26 21:00:20,807 - INFO - File database: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src/data/new_users.db
+2025-01-26 21:00:21,593 - INFO - === Avvio Applicazione ===
+2025-01-26 21:00:21,593 - INFO - Python versione: 3.12.8 (v3.12.8:2dc476bcb91, Dec  3 2024, 14:43:19) [Clang 13.0.0 (clang-1300.0.29.30)]
+2025-01-26 21:00:21,593 - INFO - Sistema operativo: posix
+2025-01-26 21:00:21,593 - INFO - Directory corrente: /Users/sergeguea/PycharmProjects/AnalysprojectSG/src
+2025-01-26 21:00:21,593 - INFO - Inizializzazione del database...
+2025-01-26 21:00:21,597 - INFO - Database inizializzato con successo!
+2025-01-26 21:00:21,597 - INFO - Sistema inizializzato correttamente.
+2025-01-26 21:01:35,529 - INFO - Login riuscito per l'utente: admin
+2025-01-26 21:01:35,537 - INFO - Login riuscito - Utente: admin, Ruolo: admin

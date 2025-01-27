@@ -30,7 +30,7 @@ try:
     DATA_DIR = BASE_DIR / 'data'
     DATA_DIR.mkdir(exist_ok=True)
 
-    # Il nostro DB sarà .../src/data/users.db
+    # Il nostro DB sarà .../src/data/new_users.db
     DB_FILE = DATA_DIR / 'users.db'
 
     logging.info(f"Directory base del progetto (src): {BASE_DIR}")
@@ -96,7 +96,7 @@ def initialize_database():
         # Crea admin di default se non esiste
         admin_password = hashlib.sha256('admin123'.encode()).hexdigest()
         cursor.execute('''
-        INSERT OR IGNORE INTO users (
+        INSERT OR IGNORE INTO new_users (
             username, password, email, role, first_name, last_name
         ) VALUES (
             'admin',
@@ -145,7 +145,7 @@ def test_database():
         logging.info("Verifica utenti nel database:")
         cursor.execute('''
             SELECT username, email, role, first_name, last_name 
-            FROM users
+            FROM new_users
         ''')
         users = cursor.fetchall()
 

@@ -5,7 +5,7 @@ import secrets
 
 
 class UserManager:
-    def __init__(self, db_path='data/users.db'):
+    def __init__(self, db_path='data/new_users.db'):
         self.db_path = db_path
 
     def create_user(self, username, password, email, first_name, last_name, role='user'):
