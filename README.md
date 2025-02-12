@@ -228,4 +228,4 @@ def analyze_file(file_path: str) -> Dict:
 - 📧 Email: gueaserge@gmail.com
 - 💼 LinkedIn: [SergeGuea](https://linkedin.com/in/sergeguea)
 - 🐦 Twitter: [@sergeguea](https://twitter.com/sergeguea)
-- 📝 Blog: [Dev.to](https://dev.to/sergeguea)
+- 📝 Blog: [Dev.to](https://dev.to/serge3g)
